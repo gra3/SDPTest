@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GSM", "GSM\GSM.vcxproj", "{BF604A56-A3C5-49E8-BFFF-B849B96BE29F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tabletUI", "tabletUI\tabletUI.vcxproj", "{DE632C37-2812-4031-9579-0A8DB1F5837A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "potSim", "potSim\potSim.vcxproj", "{856C4CAE-2D7E-4AD2-A915-20299AE7B74F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF604A56-A3C5-49E8-BFFF-B849B96BE29F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BF604A56-A3C5-49E8-BFFF-B849B96BE29F}.Debug|Win32.Build.0 = Debug|Win32
+		{BF604A56-A3C5-49E8-BFFF-B849B96BE29F}.Release|Win32.ActiveCfg = Release|Win32
+		{BF604A56-A3C5-49E8-BFFF-B849B96BE29F}.Release|Win32.Build.0 = Release|Win32
+		{DE632C37-2812-4031-9579-0A8DB1F5837A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DE632C37-2812-4031-9579-0A8DB1F5837A}.Debug|Win32.Build.0 = Debug|Win32
+		{DE632C37-2812-4031-9579-0A8DB1F5837A}.Release|Win32.ActiveCfg = Release|Win32
+		{DE632C37-2812-4031-9579-0A8DB1F5837A}.Release|Win32.Build.0 = Release|Win32
+		{856C4CAE-2D7E-4AD2-A915-20299AE7B74F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{856C4CAE-2D7E-4AD2-A915-20299AE7B74F}.Debug|Win32.Build.0 = Debug|Win32
+		{856C4CAE-2D7E-4AD2-A915-20299AE7B74F}.Release|Win32.ActiveCfg = Release|Win32
+		{856C4CAE-2D7E-4AD2-A915-20299AE7B74F}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
