@@ -186,6 +186,7 @@ int main(int argc, char* args[])
 			if( e.type == SDL_QUIT )
 			{
 				quit = true;
+				exit(1);
 			}
 			//CHIP 1 PLUS
 			if(chip_1_plus_Button.isEnabled()&&chip_1_plus_Button.handleEvent(&e)&&e.type == SDL_MOUSEBUTTONUP)

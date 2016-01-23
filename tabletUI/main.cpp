@@ -321,6 +321,7 @@ int main(int argc, char* args[])
 				if( e.type == SDL_QUIT )
 				{
 					quit = true;
+					exit(1);
 				}
 				//Start Button
 				if(startButton.isEnabled()&&startButton.handleEvent(&e)&&e.type == SDL_MOUSEBUTTONUP)
@@ -415,8 +416,8 @@ int main(int argc, char* args[])
 
 	SDL_DestroyWindow( gWindow );
 	SDLNet_Quit();
-	SDL_Quit();
 	TTF_Quit();
+	SDL_Quit();
 	
 	return 0;
 }
