@@ -53,6 +53,9 @@ string currentBetString;
 double minToRaise;
 string minToRaiseString;
 
+bool waitingForNextRound;
+bool isActive;
+
 void setDest(int x, int y, int w, int h)
 {
 	dest.x = x;
@@ -156,7 +159,6 @@ void proccessIncData(string strIn)
 	if(strIn.length()>10)
 	{
 		startButton.disable();
-		enabledAllCards();
 	}
 
 	/*string messageString(msgIn);*/
@@ -177,7 +179,7 @@ void proccessIncData(string strIn)
 	}
 	
 
-	if(data.size()==24)
+	if(data.size()==25)
 	{
 		handCard[0].set(data[1],data[0]);
 		handCard[1].set(data[3],data[2]);
@@ -221,6 +223,11 @@ void proccessIncData(string strIn)
 		stream.str(string());
 		stream << fixed << setprecision(2) << data[23];
 		minToRaiseString = stream.str();
+
+		//isActive
+		isActive = data[24];
+		if(isActive) enabledAllCards();
+
 
 	}
 	else cout << "Error data.size() = " << data.size() << endl;
@@ -284,6 +291,10 @@ int main(int argc, char* args[])
 	commCard[3] = Card(0,0,525,25,71,96,gRenderer);
 	commCard[4] = Card(0,0,600,25,71,96,gRenderer);
 
+	waitingForNextRound = false;
+	state = 0;
+	isActive = false;
+
 	//SDL_Thread* tcpThread;
 	//tcpThread = SDL_CreateThread(TcpThread, "TCP THREAD", (void *)NULL);
 
@@ -323,7 +334,8 @@ int main(int argc, char* args[])
 					if(sendServer("buyIn"))
 					{
 						buyInButton.disable();
-						startButton.enable();
+						if(state==0) startButton.enable();
+						else if(state>0) waitingForNextRound=true;
 					}
 				}
 				//Connect Button
@@ -361,10 +373,10 @@ int main(int argc, char* args[])
 			drawText(10,0,"Player " + to_string(playerNum));
 
 			//Draw Pot Total
-			if(state>0) drawText(425,235,"Pot Total: $" + potTotalString);
+			if(state>0&&isActive) drawText(425,235,"Pot Total: $" + potTotalString);
 
 			//Draw Player Total
-			if(state>0) drawText(425,270,"Chip Total: $:" + playerTotalString);
+			if(state>0&&isActive) drawText(425,270,"Chip Total: $:" + playerTotalString);
 
 			//Draw minToCall and currentBet
 			if(state==3&&isBetting) 
@@ -394,11 +406,17 @@ int main(int argc, char* args[])
 			if(isBigBlind) SDL_RenderCopy(gRenderer,bigBlindImage,NULL,&dest);
 			else if(isSmallBlind) SDL_RenderCopy(gRenderer,smallBlindImage,NULL,&dest);
 
+			//Draw Waiting for next round
+			if(waitingForNextRound&&!isActive) drawText(screenWidth/2,screenHeight/2,"Waiting for next hand...");
+
 			SDL_RenderPresent(gRenderer);
 			SDL_Delay(30);
 	}
 
 	SDL_DestroyWindow( gWindow );
+	SDLNet_Quit();
 	SDL_Quit();
+	TTF_Quit();
+	
 	return 0;
 }

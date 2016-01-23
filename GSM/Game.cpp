@@ -167,7 +167,10 @@ void Game::updatePlayer(int playerNum)
 	buildMsg += to_string(player[playerNum].currentBet - player[playerNum].lastCurrentBet) + " ";
 
 	//MinToRaise
-	buildMsg += to_string((minToCall*2)-player[playerNum].lastCurrentBet) + " \n";
+	buildMsg += to_string((minToCall*2)-player[playerNum].lastCurrentBet) + " ";
+
+	//isActive
+	buildMsg += to_string(player[playerNum].isActive()) + " \n";
 
 	
 	char* outMsg = &buildMsg[0u];
@@ -349,7 +352,8 @@ void Game::start()
 						}
 					}
 					readWeightSensor();
-					for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
+					//for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
+					for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
 					SDL_Delay(250);
 				}
 			}
