@@ -58,7 +58,7 @@ void quitSDL()
 
 bool connectToServer()
 {
-	if(SDLNet_ResolveHost(&serverIP, "192.168.2.100", 9001)==-1) 
+	if(SDLNet_ResolveHost(&serverIP, "192.168.2.2", 9001)==-1) 
 	{
 		printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
 		return false;

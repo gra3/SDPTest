@@ -19,6 +19,7 @@ Player::Player()
 	isAllIn = false;
 	possibleWinner = false;
 	totalPutIntoPot = 0;
+	buyInNextRound = false;
 }
 
 

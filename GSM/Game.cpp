@@ -228,6 +228,11 @@ int Game::numberAbleToBet()
 
 void Game::resetNewHand()
 {
+	for(int i=0; i<numberOfPlayers;i++)
+	{
+		if(player[i].buyInNextRound==true) player[i].buyIn(20);
+	}
+
 	for(int i=0;i<numberOfPlayers;i++)
 	{
 		if(player[i].isDealer())
@@ -242,6 +247,9 @@ void Game::resetNewHand()
 		if(player[i].isSmallBlind())
 		{
 			player[i].setSmallBlind(false);
+		}
+		if(player[i].isDealer())
+		{
 			player[i].findNextActive()->setSmallBlind(true);
 			break;
 		}
@@ -251,7 +259,10 @@ void Game::resetNewHand()
 		if(player[i].isBigBlind())
 		{
 			player[i].setBigBlind(false);
-			player[i].findNextActive()->setBigBlind(true);
+		}
+		if(player[i].isDealer())
+		{
+			player[i].findNextActive()->findNextActive()->setBigBlind(true);
 			break;
 		}
 	}
@@ -268,6 +279,7 @@ void Game::resetNewHand()
 		player[i].isStillInRound = false;
 		player[i].fullHand.resetPokerHand();
 		player[i].possibleWinner = false;
+		player[i].buyInNextRound =false;
 	}
 	for(int i=0;i<5;i++) commCard[i].set(0,0);
 	bettingPlayer = NULL;
@@ -346,6 +358,16 @@ void Game::start()
 
 			//*********************************************BLINDS*****************************************************
 			case BLINDS:
+
+			if(getCommand(command,ident)>=0)
+			{
+				//Buy-in
+				if(strcmp(command,"buyIn")==0)
+				{
+					cout << "Player " << ident << " bought in!!!\n";
+					player[ident].buyInNextRound = true;
+				}
+			}
 
 			if(tempPot!=readWeightSensor())
 			{
@@ -574,6 +596,14 @@ void Game::start()
 						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
 					}
+
+					//Buy-in
+					if(strcmp(command,"buyIn")==0)
+					{
+						cout << "Player " << ident << " bought in!!!\n";
+						player[ident].buyInNextRound = true;
+					}
+
 				}
 
 			//If all called, end the round of betting
@@ -621,6 +651,16 @@ void Game::start()
 			break;
 			//*********************************************COMMUNITY CARDS*****************************************************
 			case COMMCARD:
+
+			if(getCommand(command,ident)>=0)
+			{
+				//Buy-in
+				if(strcmp(command,"buyIn")==0)
+				{
+					cout << "Player " << ident << " bought in!!!\n";
+					player[ident].buyIn(20);
+				}
+			}
 
 			cout << "Now in Community Card State\n";
 			if(bettingRound==2)
@@ -671,6 +711,17 @@ void Game::start()
 			//*********************************************HAND RES*****************************************************
 			case HANDRES:
 			{
+			
+			if(getCommand(command,ident)>=0)
+			{
+				//Buy-in
+				if(strcmp(command,"buyIn")==0)
+				{
+					cout << "Player " << ident << " bought in!!!\n";
+					player[ident].buyIn(20);
+				}
+			}
+
 			cout << "Now in Hand Resolution State\n";
 
 			int highestRank = 0;
@@ -777,6 +828,16 @@ void Game::start()
 			}
 			//*********************************************CLEAN UP*****************************************************
 			case CLEANUP:
+
+			if(getCommand(command,ident)>=0)
+			{
+				//Buy-in
+				if(strcmp(command,"buyIn")==0)
+				{
+					cout << "Player " << ident << " bought in!!!\n";
+					player[ident].buyIn(20);
+				}
+			}
 
 			if(readWeightSensor()==0)
 			{

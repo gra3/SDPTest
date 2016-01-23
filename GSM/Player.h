@@ -21,6 +21,7 @@ public:
 	bool isStillInRound;
 	bool isAllIn;
 	bool possibleWinner;
+	bool buyInNextRound;
 	PokerHand fullHand;
 
 	Player* nextPlayer;
