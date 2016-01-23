@@ -245,28 +245,19 @@ void Game::resetNewHand()
 			break;
 		}
 	}
+
 	for(int i=0;i<numberOfPlayers;i++)
 	{
-		if(player[i].isSmallBlind())
-		{
-			player[i].setSmallBlind(false);
-		}
+		player[i].setSmallBlind(false);
+		player[i].setBigBlind(false);
+	}
+
+	for(int i=0;i<numberOfPlayers;i++)
+	{
 		if(player[i].isDealer())
 		{
 			player[i].findNextActive()->setSmallBlind(true);
-			break;
-		}
-	}
-	for(int i=0;i<numberOfPlayers;i++)
-	{
-		if(player[i].isBigBlind())
-		{
-			player[i].setBigBlind(false);
-		}
-		if(player[i].isDealer())
-		{
 			player[i].findNextActive()->findNextActive()->setBigBlind(true);
-			break;
 		}
 	}
 
@@ -710,6 +701,7 @@ void Game::start()
 				SDL_Delay(50);
 			}
 			if(bettingBypass) for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
+			SDL_Delay(100);
 			break;
 
 			//*********************************************HAND RES*****************************************************
