@@ -233,6 +233,12 @@ void Game::resetNewHand()
 {
 	for(int i=0; i<numberOfPlayers;i++)
 	{
+		if(player[i].chipTotal==0)
+		{
+			player[i].setInactive();
+			updatePlayer(i);
+			SDL_Delay(100);
+		}
 		if(player[i].buyInNextRound==true) player[i].buyIn(20);
 	}
 

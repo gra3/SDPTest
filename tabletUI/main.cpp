@@ -136,6 +136,17 @@ void enabledAllCards()
 	commCard[4].enable();
 }
 
+void disableAllCards()
+{
+	handCard[0].disable();
+	handCard[1].disable();
+	commCard[0].disable();
+	commCard[1].disable();
+	commCard[2].disable();
+	commCard[3].disable();
+	commCard[4].disable();
+}
+
 void drawAllCards()
 {
 	handCard[0].draw();
@@ -226,7 +237,12 @@ void proccessIncData(string strIn)
 
 		//isActive
 		isActive = data[24];
-		if(isActive) enabledAllCards();
+		if(isActive) 
+		{
+			waitingForNextRound = false;
+			enabledAllCards();
+		}
+		else if(!isActive) disableAllCards();
 
 
 	}
@@ -314,7 +330,7 @@ int main(int argc, char* args[])
 		//	cout << "From Main Loop: " << data << endl;
 		//	//proccessIncData(data);
 		//}
-
+		if(state>0&&!isActive&&!buyInButton.isEnabled()&&!waitingForNextRound) buyInButton.enable();
 		while( SDL_PollEvent( &e ) != 0 )
 			{
 
@@ -400,12 +416,12 @@ int main(int argc, char* args[])
 
 			//Draw Dealer Chip
 			setDest(225,300,75,75);
-			if(isDealer) SDL_RenderCopy(gRenderer,dealerImage,NULL,&dest);
+			if(isDealer&&isActive) SDL_RenderCopy(gRenderer,dealerImage,NULL,&dest);
 
 			//Draw Big/Small Blind chip
 			setDest(325,300,75,75);
-			if(isBigBlind) SDL_RenderCopy(gRenderer,bigBlindImage,NULL,&dest);
-			else if(isSmallBlind) SDL_RenderCopy(gRenderer,smallBlindImage,NULL,&dest);
+			if(isBigBlind&&isActive) SDL_RenderCopy(gRenderer,bigBlindImage,NULL,&dest);
+			else if(isSmallBlind&&isActive) SDL_RenderCopy(gRenderer,smallBlindImage,NULL,&dest);
 
 			//Draw Waiting for next round
 			if(waitingForNextRound&&!isActive) drawText(screenWidth/2,screenHeight/2,"Waiting for next hand...");
