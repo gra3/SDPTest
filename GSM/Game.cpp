@@ -229,6 +229,16 @@ int Game::numberAbleToBet()
 	return c;
 }
 
+int Game::numberAllIn()
+{
+	int c = 0;
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isActive()&&player[i].isAllIn) c++;
+	}
+	return c;
+}
+
 void Game::resetNewHand()
 {
 	for(int i=0; i<numberOfPlayers;i++)
@@ -462,7 +472,7 @@ void Game::start()
 						player[i].lastCurrentBet = 0;
 						if(player[i].isSmallBlind())
 						{
-							if(player[i].isStillInRound)
+							if(player[i].isStillInRound&&!player[i].isAllIn)
 							{
 								bettingPlayer = &player[i];
 								bettingPlayer->setBetting(true);
@@ -529,15 +539,22 @@ void Game::start()
 						if((player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet)==player[bettingPlayerNumber].chipTotal)
 						{
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
-							callCount++;
+						
 							cout << "Player " << bettingPlayerNumber << " went all in for $" << player[bettingPlayerNumber].currentBet << endl;
 							player[bettingPlayerNumber].chipTotal -= player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							if(player[bettingPlayerNumber].chipTotal == 0) player[bettingPlayerNumber].isAllIn = true;
 							//minToCall = player[bettingPlayerNumber].currentBet;
 							player[bettingPlayerNumber].setBetting(false);
+							callCount++;
+							if(player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet > minToCall)
+							{
+								minToCall = player[bettingPlayerNumber].currentBet;
+								callCount = 0;
+							}
+
 							updatePlayer(bettingPlayerNumber);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
@@ -555,7 +572,7 @@ void Game::start()
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
@@ -575,7 +592,7 @@ void Game::start()
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
@@ -591,12 +608,14 @@ void Game::start()
 						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
 						bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-						if(callCount != numberStillInRound()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
+						if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
 						potLastBet = potTotal;
 						player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
 					}
+
+					cout << "Call count: " << callCount << "   " << "Number in Round: " << numberStillInRound() << "Able to bet: " << numberAbleToBet() << endl;
 
 					//Buy-in
 					if(strcmp(command,"buyIn")==0)
@@ -608,7 +627,7 @@ void Game::start()
 				}
 
 			//If all called, end the round of betting
-			if(callCount == numberStillInRound())
+			if(callCount == numberStillInRound()-numberAllIn())
 			{
 				bettingRound++;
 				cout << "BETTING ROUND: " << bettingRound << endl;

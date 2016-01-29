@@ -45,6 +45,7 @@ public:
 	void initializeCamerasToZero();
 	int numberStillInRound();
 	int numberAbleToBet();
+	int numberAllIn();
 	void resetNewHand();
 };
 
