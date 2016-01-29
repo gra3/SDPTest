@@ -131,3 +131,10 @@ Player* Player::findNextActiveAndInRound()
 	}
 	return nextActive;
 }
+
+bool Player::operator<(const Player &other)
+{
+	cout << "HERE!!!!!\n";
+	if(fullHand<other.fullHand) return true;
+	else return false;
+}

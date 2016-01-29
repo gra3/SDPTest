@@ -1,6 +1,9 @@
 #pragma once
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <iostream>
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <fstream>
@@ -47,5 +50,7 @@ public:
 	int numberAbleToBet();
 	int numberAllIn();
 	void resetNewHand();
+	int rRank();
+	int rSuit();
 };
 

@@ -26,6 +26,10 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 	cout << "Buy in: " << buyIn << "   Small Blind: " << smallBlind << "   Big Blind: " << bigBlind << endl;
 	cout << "Denominations: " << chip_1_value << "   " << chip_2_value << "   " << chip_3_value << "   " << chip_4_value << endl;
 
+	//RNG
+	srand (time(NULL));
+	for(int i=0;i<100;i++) cout << rSuit() << "\n";
+
 
 	for(int i=0;i<numPlayers;i++) player.push_back(Player());
 	initSDL();
@@ -85,6 +89,16 @@ void Game::initializeCamerasToZero()
 	}
 	cout << "All Cameras Initialized to ZERO.\n";
 
+}
+
+int Game::rRank()
+{
+	return (rand() % 13) + 2;
+}
+
+int Game::rSuit()
+{
+	return rand() % 4;
 }
 
 void Game::getHands()
@@ -421,13 +435,13 @@ void Game::start()
 			case DEALING:
 			
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
-			player[0].hand[0].set(12,1);
-			player[0].hand[1].set(12,3);
+			player[0].hand[0].set(2,1);
+			player[0].hand[1].set(2,3);
 			player[0].fullHand.addCard(player[0].hand[0]);
 			player[0].fullHand.addCard(player[0].hand[1]);
 
-			player[1].hand[0].set(10,3);
-			player[1].hand[1].set(11,3);
+			player[1].hand[0].set(5,3);
+			player[1].hand[1].set(5,3);
 			player[1].fullHand.addCard(player[1].hand[0]);
 			player[1].fullHand.addCard(player[1].hand[1]);
 
@@ -685,9 +699,9 @@ void Game::start()
 			cout << "Now in Community Card State\n";
 			if(bettingRound==2)
 			{
-				commCard[0].set(5,1);
-				commCard[1].set(5,3);
-				commCard[2].set(9,1);
+				commCard[0].set(14,1);
+				commCard[1].set(13,3);
+				commCard[2].set(12,1);
 				player[0].fullHand.addCard(commCard[0]);
 				player[0].fullHand.addCard(commCard[1]);
 				player[0].fullHand.addCard(commCard[2]);
@@ -702,7 +716,7 @@ void Game::start()
 
 			if(bettingRound==3)
 			{
-				commCard[3].set(10,2);
+				commCard[3].set(11,2);
 				player[0].fullHand.addCard(commCard[3]);
 				player[1].fullHand.addCard(commCard[3]);
 				player[2].fullHand.addCard(commCard[3]);
@@ -711,7 +725,7 @@ void Game::start()
 
 			if(bettingRound==4)
 			{
-				commCard[4].set(11,0);
+				commCard[4].set(10,0);
 				player[0].fullHand.addCard(commCard[4]);
 				player[1].fullHand.addCard(commCard[4]);
 				player[2].fullHand.addCard(commCard[4]);
@@ -779,6 +793,18 @@ void Game::start()
 				
 			}
 
+			//STL sort test
+			cout << "/////////////////Sort Test Begin/////////////////////////\n";
+			vector<Player> sortTestPlayer;
+			for(int i=0;i<numberOfPlayers;i++) sortTestPlayer.push_back(player[i]);
+
+			for(int i = 0;i<numberOfPlayers;i++) cout << sortTestPlayer[i].getPlayerNumber() << " ";
+			cout << endl;
+			sort(sortTestPlayer.begin(), sortTestPlayer.end());
+			for(int i = 0;i<numberOfPlayers;i++) cout << sortTestPlayer[i].getPlayerNumber() << " ";
+			cout << endl;
+			cout << "/////////////////Sort Test End/////////////////////////\n";
+
 			vector<Player*> winner;
 			//If only 1 possible winner
 			if(numWithHighestRank==1)
@@ -817,6 +843,7 @@ void Game::start()
 						winner.push_back(unsortedPossibleWinner[i]);
 					}
 				}
+
 
 				cout << "Number of Winners: " << winner.size() << endl;
 				for(int i=0;i<winner.size();i++)

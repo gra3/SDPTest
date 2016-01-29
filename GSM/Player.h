@@ -52,5 +52,7 @@ public:
 	void setBetting(bool val);
 
 	void getHand();
+
+	bool operator<(const Player &other);
 };
 
