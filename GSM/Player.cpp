@@ -135,6 +135,15 @@ Player* Player::findNextActiveAndInRound()
 bool Player::operator<(const Player &other)
 {
 	cout << "HERE!!!!!\n";
-	if(fullHand<other.fullHand) return true;
-	else return false;
+
+	if(fullHand.hand.size()==7)
+	{
+		if(fullHand<other.fullHand) return true;
+		else return false;
+	}
+	else 
+	{
+		cout << "Error Player::operator<   sorting without 7 cards\n";
+		return false;
+	}
 }

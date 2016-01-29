@@ -28,7 +28,7 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 
 	//RNG
 	srand (time(NULL));
-	for(int i=0;i<100;i++) cout << rSuit() << "\n";
+
 
 
 	for(int i=0;i<numPlayers;i++) player.push_back(Player());
@@ -435,18 +435,18 @@ void Game::start()
 			case DEALING:
 			
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
-			player[0].hand[0].set(2,1);
-			player[0].hand[1].set(2,3);
+			player[0].hand[0].set(rRank(),rSuit());
+			player[0].hand[1].set(rRank(),rSuit());
 			player[0].fullHand.addCard(player[0].hand[0]);
 			player[0].fullHand.addCard(player[0].hand[1]);
 
-			player[1].hand[0].set(5,3);
-			player[1].hand[1].set(5,3);
+			player[1].hand[0].set(rRank(),rSuit());
+			player[1].hand[1].set(rRank(),rSuit());
 			player[1].fullHand.addCard(player[1].hand[0]);
 			player[1].fullHand.addCard(player[1].hand[1]);
 
-			player[2].hand[0].set(4,3);
-			player[2].hand[1].set(4,2);
+			player[2].hand[0].set(rRank(),rSuit());
+			player[2].hand[1].set(rRank(),rSuit());
 			player[2].fullHand.addCard(player[2].hand[0]);
 			player[2].fullHand.addCard(player[2].hand[1]);
 
@@ -699,9 +699,9 @@ void Game::start()
 			cout << "Now in Community Card State\n";
 			if(bettingRound==2)
 			{
-				commCard[0].set(14,1);
-				commCard[1].set(13,3);
-				commCard[2].set(12,1);
+				commCard[0].set(rRank(),rSuit());
+				commCard[1].set(rRank(),rSuit());
+				commCard[2].set(rRank(),rSuit());
 				player[0].fullHand.addCard(commCard[0]);
 				player[0].fullHand.addCard(commCard[1]);
 				player[0].fullHand.addCard(commCard[2]);
@@ -716,7 +716,7 @@ void Game::start()
 
 			if(bettingRound==3)
 			{
-				commCard[3].set(11,2);
+				commCard[3].set(rRank(),rSuit());
 				player[0].fullHand.addCard(commCard[3]);
 				player[1].fullHand.addCard(commCard[3]);
 				player[2].fullHand.addCard(commCard[3]);
@@ -725,7 +725,7 @@ void Game::start()
 
 			if(bettingRound==4)
 			{
-				commCard[4].set(10,0);
+				commCard[4].set(rRank(),rSuit());
 				player[0].fullHand.addCard(commCard[4]);
 				player[1].fullHand.addCard(commCard[4]);
 				player[2].fullHand.addCard(commCard[4]);
