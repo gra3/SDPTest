@@ -12,6 +12,7 @@ public:
 	vector<Player*> ableToWin;
 	vector<Player*> winners;
 	void addToPot(double ammountIn);
+	void rmFromPot(double ammountIn);
 	void printPot();
 	void addEligiblePlayer(Player* playerIn);
 	void rmEligiblePlayer(int playerNum);

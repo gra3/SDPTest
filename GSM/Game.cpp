@@ -48,7 +48,7 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 	cout << "All Players Connected!!!\n";
 
 	//Initialize PotManager
-	pots = new PotManager(&player);
+	pots = new PotManager(&player,&minToCall);
 
 	//Initialize commCards
 	commCard[0] = Card(0,0);
@@ -314,6 +314,7 @@ void Game::resetNewHand()
 	bettingBypass = false;
 	callCount = 0;
 	deck.resetDeck();
+	pots->reset();
 }
 
 void Game::calcActiveHands()
@@ -642,7 +643,6 @@ void Game::start()
 						if((player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet)==player[bettingPlayerNumber].chipTotal)
 						{
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
-						
 							cout << "Player " << bettingPlayerNumber << " went all in for $" << player[bettingPlayerNumber].currentBet << endl;
 							player[bettingPlayerNumber].chipTotal -= player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							if(player[bettingPlayerNumber].chipTotal == 0) player[bettingPlayerNumber].isAllIn = true;
@@ -654,6 +654,7 @@ void Game::start()
 								minToCall = player[bettingPlayerNumber].currentBet;
 								callCount = 0;
 							}
+							pots->allIn(bettingPlayerNumber,player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet,callCount);
 
 							updatePlayer(bettingPlayerNumber);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
@@ -721,7 +722,7 @@ void Game::start()
 						SDL_Delay(50);
 					}
 
-					cout << "Call count: " << callCount << "   " << "Number in Round: " << numberStillInRound() << "Able to bet: " << numberAbleToBet() << endl;
+					cout << "Call count: " << callCount << "   " << "Number in Round: " << numberStillInRound() << "Able to bet: " << numberAbleToBet() << "Num All In: " << numberAllIn() << endl;
 
 					//Buy-in
 					if(strcmp(command,"buyIn")==0)
@@ -732,8 +733,9 @@ void Game::start()
 
 				}
 
+
 			//If all called, end the round of betting
-			if(callCount == numberStillInRound()-numberAllIn())
+			else if(callCount == numberStillInRound()-numberAllIn())
 			{
 				pots->printPots();
 				bettingRound++;
@@ -750,20 +752,21 @@ void Game::start()
 				SDL_Delay(100);
 				//break;
 			}
-
 			//If only 1 still in round
-			if(numberStillInRound()==1)
+			else if(numberStillInRound()==1)
 			{
+				pots->printPots();
 				for(int i=0;i<numberOfPlayers; i++) player[i].setBetting(false);
+				cout << "ONLY ONE IN ROUND!!!\n";
 				updatePlayer(bettingPlayerNumber);
 				state = HANDRES;
 				SDL_Delay(50);
 			}
-
 			//Skip Future betting
-			if(numberStillInRound()>1&&numberAbleToBet()==1)
+			else if(numberStillInRound()>1&&numberAbleToBet()==1&&(callCount == (numberStillInRound()-numberAllIn())))
 			{
 				//bettingRound++;
+				pots->printPots();
 				for(int i=0;i<numberOfPlayers; i++) player[i].setBetting(false);
 				cout << "BYPASS!!!\n"  << endl;
 				bettingBypass = true;

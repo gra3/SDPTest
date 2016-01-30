@@ -16,6 +16,11 @@ void Pot::addToPot(double ammountIn)
 	ammount += ammountIn;
 }
 
+void Pot::rmFromPot(double ammountIn)
+{
+	ammount -= ammountIn;
+}
+
 void Pot::printPot()
 {
 	cout << "     " << name << ": " << ammount << " - ";

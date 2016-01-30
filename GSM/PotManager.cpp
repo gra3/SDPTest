@@ -1,9 +1,10 @@
 #include "PotManager.h"
 
 
-PotManager::PotManager(vector<Player>* allPlayersIn)
+PotManager::PotManager(vector<Player>* allPlayersIn, double* minToCallIn)
 {
 	allPlayers = allPlayersIn;
+	minCall = minToCallIn;
 }
 
 
@@ -59,4 +60,40 @@ void PotManager::fold(int playerNum)
 	{
 		pot[i].rmEligiblePlayer(playerNum);
 	}
+}
+
+void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
+{
+	//Make new sidepot
+	makeSidePot();
+
+	//Add All players to the new sidepot that aren't the one that just went all in
+	for(int i= 0;i<allPlayers->size();i++)
+	{
+		if(allPlayers->at(i).isActive()&&
+		   allPlayers->at(i).isStillInRound&&
+		   !allPlayers->at(i).isAllIn)
+		{
+			pot[pot.size()-1].addEligiblePlayer(&allPlayers->at(i));
+		}
+	}
+
+	//Determine if anything needs to be transfered to the new sidepot
+	double rmFromPrevPot = 0;
+	if(*minCall>ammountIn)
+	{
+		rmFromPrevPot = *minCall - ammountIn;
+		pot[pot.size()-2].rmFromPot(rmFromPrevPot);
+		pot[pot.size()-1].addToPot(rmFromPrevPot);
+	}
+	else if(*minCall==ammountIn)
+	{
+		pot[pot.size()-1].addToPot(ammountIn);
+	}
+
+}
+
+void PotManager::reset()
+{
+	pot.clear();
 }
