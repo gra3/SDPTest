@@ -52,5 +52,8 @@ public:
 	void resetNewHand();
 	int rRank();
 	int rSuit();
+	void calcActiveHands();
+	int calcHighestRank();
+	int numberWithHighestRank(int highestRank);
 };
 

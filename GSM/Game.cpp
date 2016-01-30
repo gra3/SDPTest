@@ -313,6 +313,37 @@ void Game::resetNewHand()
 	deck.resetDeck();
 }
 
+void Game::calcActiveHands()
+{
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isActive()&&player[i].isStillInRound) player[i].fullHand.calcHandRank();
+	}
+}
+
+int Game::calcHighestRank()
+{
+	int highestRank = 0;
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].fullHand.handRank>highestRank&&player[i].isStillInRound)
+		{
+			highestRank = player[i].fullHand.handRank;
+		}
+	}
+	return highestRank;
+}
+
+int Game::numberWithHighestRank(int highestRank)
+{
+	int count = 0;
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isStillInRound&&player[i].fullHand.handRank==highestRank) count++;
+	}
+	return count;
+}
+
 void Game::start()
 {
 	int ident = 0;
@@ -435,18 +466,18 @@ void Game::start()
 			case DEALING:
 			
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
-			player[0].hand[0].set(2,1);
-			player[0].hand[1].set(3,2);
+			player[0].hand[0].set(3,0);
+			player[0].hand[1].set(4,1);
 			player[0].fullHand.addCard(player[0].hand[0]);
 			player[0].fullHand.addCard(player[0].hand[1]);
 
-			player[1].hand[0].set(2,3);
-			player[1].hand[1].set(4,2);
+			player[1].hand[0].set(4,2);
+			player[1].hand[1].set(3,3);
 			player[1].fullHand.addCard(player[1].hand[0]);
 			player[1].fullHand.addCard(player[1].hand[1]);
 
 			player[2].hand[0].set(3,2);
-			player[2].hand[1].set(5,0);
+			player[2].hand[1].set(14,0);
 			player[2].fullHand.addCard(player[2].hand[0]);
 			player[2].fullHand.addCard(player[2].hand[1]);
 
@@ -699,9 +730,9 @@ void Game::start()
 			cout << "Now in Community Card State\n";
 			if(bettingRound==2)
 			{
-				commCard[0].set(7,1);
-				commCard[1].set(9,3);
-				commCard[2].set(10,2);
+				commCard[0].set(14,1);
+				commCard[1].set(12,2);
+				commCard[2].set(6,0);
 				player[0].fullHand.addCard(commCard[0]);
 				player[0].fullHand.addCard(commCard[1]);
 				player[0].fullHand.addCard(commCard[2]);
@@ -716,7 +747,7 @@ void Game::start()
 
 			if(bettingRound==3)
 			{
-				commCard[3].set(12,1);
+				commCard[3].set(13,3);
 				player[0].fullHand.addCard(commCard[3]);
 				player[1].fullHand.addCard(commCard[3]);
 				player[2].fullHand.addCard(commCard[3]);
@@ -725,7 +756,7 @@ void Game::start()
 
 			if(bettingRound==4)
 			{
-				commCard[4].set(14,0);
+				commCard[4].set(8,1);
 				player[0].fullHand.addCard(commCard[4]);
 				player[1].fullHand.addCard(commCard[4]);
 				player[2].fullHand.addCard(commCard[4]);
@@ -759,28 +790,9 @@ void Game::start()
 
 			cout << "Now in Hand Resolution State\n";
 
-			int highestRank = 0;
-			int numWithHighestRank = 0;
-
-			//Calculate Hands for each player still in game
-			// and determine the highest rank among players and how many have it
-			for(int i=0;i<numberOfPlayers;i++)
-			{
-				if(player[i].isActive()&&player[i].isStillInRound)
-				{
-					player[i].fullHand.calcHandRank();
-					//player[i].fullHand.printBestHand();
-					if(player[i].fullHand.handRank>highestRank&&player[i].isStillInRound)
-					{
-						highestRank = player[i].fullHand.handRank;
-						numWithHighestRank = 1;
-					}
-					else if(player[i].fullHand.handRank==highestRank&&player[i].isStillInRound)
-					{
-						numWithHighestRank++;
-					}
-				}
-			}
+			calcActiveHands();
+			int highestRank = calcHighestRank();
+			int numWithHighestRank = numberWithHighestRank(highestRank);
 			
 			//Flag Possible Winning Players
 			for(int i=0;i<numberOfPlayers;i++)
@@ -793,7 +805,6 @@ void Game::start()
 				
 			}
 
-			cout << "TESTING BRANCH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 			//STL sort test
 			cout << "/////////////////Sort Test Begin/////////////////////////\n";
 			vector<Player> sortTestPlayer;

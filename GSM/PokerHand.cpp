@@ -742,7 +742,8 @@ bool PokerHand::operator<(const PokerHand &other)
 			if(highCard>other.highCard) return false;
 			else if(highCard==other.highCard)
 			{
-				if(kicker>other.kicker) return false;
+				if(kicker==other.kicker) return false;
+				else if(kicker>other.kicker) return false;
 				else return true;
 			}
 			else return true;
