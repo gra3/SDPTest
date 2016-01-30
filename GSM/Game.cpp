@@ -47,6 +47,9 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 	}
 	cout << "All Players Connected!!!\n";
 
+	//Initialize PotManager
+	pots = new PotManager(&player);
+
 	//Initialize commCards
 	commCard[0] = Card(0,0);
 	commCard[1] = Card(0,0);
@@ -344,6 +347,51 @@ int Game::numberWithHighestRank(int highestRank)
 	return count;
 }
 
+void Game::calcPots()
+{
+	vector<double> totalPutIn;
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isActive()&&player[i].isStillInRound) totalPutIn.push_back(player[i].totalPutIntoPot);
+	}
+	int min = totalPutIn[0];
+	for(int i=0;i<totalPutIn.size();i++)
+	{
+		if(totalPutIn[i]<min) min = totalPutIn[i];
+	}
+	for(int i=0;i<totalPutIn.size();i++)
+	{
+		cout << totalPutIn[i] << "  ";
+	}
+	cout << "\nMin Main pot: " << min << endl;
+}
+
+vector<Player> Game::sortPokerHands()
+{
+	cout << "/////////////////Sort PokerHands Begin/////////////////////////\n";
+	vector<Player> sortedPlayerHands;
+	for(int i=0;i<numberOfPlayers;i++) sortedPlayerHands.push_back(player[i]);
+	sort(sortedPlayerHands.begin(), sortedPlayerHands.end());
+	vector<int> toBeErased;
+	for(int i=0;i<sortedPlayerHands.size();i++)
+	{
+		if(!sortedPlayerHands[i].isStillInRound)
+		{
+			toBeErased.push_back(i);
+		}
+	}
+
+	for(int i=0;i<toBeErased.size();i++)
+	{
+		sortedPlayerHands.erase(sortedPlayerHands.begin()+toBeErased[i]);
+	}
+	cout << "Sorted PokerHands (low to high): ";
+	for(int i = 0;i<sortedPlayerHands.size();i++) cout << "Player " << sortedPlayerHands[i].getPlayerNumber() << "   ";
+	cout << endl;
+	cout << "/////////////////Sort PokerHands End/////////////////////////\n";
+	return sortedPlayerHands;
+}
+
 void Game::start()
 {
 	int ident = 0;
@@ -415,6 +463,11 @@ void Game::start()
 			//*********************************************BLINDS*****************************************************
 			case BLINDS:
 
+			pots->makeMainPot();
+			pots->makeSidePot();
+			pots->makeSidePot();
+			pots->printPots();
+
 			if(getCommand(command,ident)>=0)
 			{
 				//Buy-in
@@ -466,18 +519,18 @@ void Game::start()
 			case DEALING:
 			
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
-			player[0].hand[0].set(3,0);
-			player[0].hand[1].set(4,1);
+			player[0].hand[0].set(rRank(),rSuit());
+			player[0].hand[1].set(rRank(),rSuit());
 			player[0].fullHand.addCard(player[0].hand[0]);
 			player[0].fullHand.addCard(player[0].hand[1]);
 
-			player[1].hand[0].set(4,2);
-			player[1].hand[1].set(3,3);
+			player[1].hand[0].set(rRank(),rSuit());
+			player[1].hand[1].set(rRank(),rSuit());
 			player[1].fullHand.addCard(player[1].hand[0]);
 			player[1].fullHand.addCard(player[1].hand[1]);
 
-			player[2].hand[0].set(3,2);
-			player[2].hand[1].set(14,0);
+			player[2].hand[0].set(rRank(),rSuit());
+			player[2].hand[1].set(rRank(),rSuit());
 			player[2].fullHand.addCard(player[2].hand[0]);
 			player[2].fullHand.addCard(player[2].hand[1]);
 
@@ -730,9 +783,9 @@ void Game::start()
 			cout << "Now in Community Card State\n";
 			if(bettingRound==2)
 			{
-				commCard[0].set(14,1);
-				commCard[1].set(12,2);
-				commCard[2].set(6,0);
+				commCard[0].set(rRank(),rSuit());
+				commCard[1].set(rRank(),rSuit());
+				commCard[2].set(rRank(),rSuit());
 				player[0].fullHand.addCard(commCard[0]);
 				player[0].fullHand.addCard(commCard[1]);
 				player[0].fullHand.addCard(commCard[2]);
@@ -747,7 +800,7 @@ void Game::start()
 
 			if(bettingRound==3)
 			{
-				commCard[3].set(13,3);
+				commCard[3].set(rRank(),rSuit());
 				player[0].fullHand.addCard(commCard[3]);
 				player[1].fullHand.addCard(commCard[3]);
 				player[2].fullHand.addCard(commCard[3]);
@@ -756,7 +809,7 @@ void Game::start()
 
 			if(bettingRound==4)
 			{
-				commCard[4].set(8,1);
+				commCard[4].set(rRank(),rSuit());
 				player[0].fullHand.addCard(commCard[4]);
 				player[1].fullHand.addCard(commCard[4]);
 				player[2].fullHand.addCard(commCard[4]);
@@ -793,96 +846,11 @@ void Game::start()
 			calcActiveHands();
 			int highestRank = calcHighestRank();
 			int numWithHighestRank = numberWithHighestRank(highestRank);
+
+			calcPots();
 			
-			//Flag Possible Winning Players
-			for(int i=0;i<numberOfPlayers;i++)
-			{
-				if(player[i].fullHand.handRank == highestRank&&player[i].isStillInRound)
-				{
-					player[i].possibleWinner=true;
-					cout << "Player " << i << " possible winner\n";
-				}
-				
-			}
+			vector<Player> sortedPokerHands = sortPokerHands();
 
-			//STL sort test
-			cout << "/////////////////Sort Test Begin/////////////////////////\n";
-			vector<Player> sortTestPlayer;
-			for(int i=0;i<numberOfPlayers;i++) sortTestPlayer.push_back(player[i]);
-
-			for(int i = 0;i<numberOfPlayers;i++) cout << sortTestPlayer[i].getPlayerNumber() << " ";
-			cout << endl;
-			sort(sortTestPlayer.begin(), sortTestPlayer.end());
-			for(int i = 0;i<numberOfPlayers;i++) cout << sortTestPlayer[i].getPlayerNumber() << " ";
-			cout << endl;
-			cout << "/////////////////Sort Test End/////////////////////////\n";
-
-			vector<Player*> winner;
-			//If only 1 possible winner
-			if(numWithHighestRank==1)
-			{
-				int winningPlayerNumber;
-				for(int i=0;i<numberOfPlayers;i++) if(player[i].possibleWinner) winningPlayerNumber = i;
-				cout << "Player " << winningPlayerNumber << " wins with\n";
-				player[winningPlayerNumber].fullHand.printBestHand();
-				winner.push_back(&player[winningPlayerNumber]);
-			}
-			//2 or more possible winners
-			else
-			{
-				vector<Player*> unsortedPossibleWinner;
-				for(int i=0;i<numberOfPlayers;i++)
-				{
-					if(player[i].possibleWinner) unsortedPossibleWinner.push_back(&player[i]);
-				}
-
-				for(int i=0;i<unsortedPossibleWinner.size();i++) unsortedPossibleWinner[i]->fullHand.printBestHand();
-				if(player[1].fullHand<player[0].fullHand) cout <<  "1<0";
-				if(player[0].fullHand<player[1].fullHand) cout <<  "1<2";
-
-				
-				Player* highest = unsortedPossibleWinner[0];
-				winner.push_back(unsortedPossibleWinner[0]);
-				for(int i=1;i<unsortedPossibleWinner.size();i++)
-				{
-					if(highest->fullHand < unsortedPossibleWinner[i]->fullHand&&!(highest->fullHand==unsortedPossibleWinner[i]->fullHand))
-					{
-						winner.clear();
-						highest = unsortedPossibleWinner[i];
-						winner.push_back(unsortedPossibleWinner[i]);
-					}
-					else if(highest->fullHand==unsortedPossibleWinner[i]->fullHand)
-					{
-						winner.push_back(unsortedPossibleWinner[i]);
-					}
-				}
-
-				cout << "size of Winner vector: " << winner.size() << endl;
-				cout << "Number of Winners: " << winner.size() << endl;
-				for(int i=0;i<winner.size();i++)
-				{
-					cout << "Player " << winner[i]->getPlayerNumber() << " won\n";
-					winner[i]->fullHand.printBestHand();
-				}
-			}
-
-			//1 Winner
-			if(winner.size()==1||numWithHighestRank==1)
-			{
-				winner[0]->chipTotal+=potTotal;
-				updatePlayer(winner[0]->getPlayerNumber());
-				SDL_Delay(50);
-			}
-			//More than 1 Winner
-			else
-			{
-				for(int i=0;i<winner.size();i++)
-				{
-					winner[i]->chipTotal += potTotal/(winner.size());
-					updatePlayer(i);
-					SDL_Delay(50);
-				}
-			}
 
 			state = CLEANUP;
 			break;

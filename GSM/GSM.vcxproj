@@ -84,6 +84,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PokerHand.cpp" />
+    <ClCompile Include="Pot.cpp" />
+    <ClCompile Include="PotManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Card.h" />
@@ -92,6 +94,8 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PokerHand.h" />
+    <ClInclude Include="Pot.h" />
+    <ClInclude Include="PotManager.h" />
     <ClInclude Include="TCPserver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
