@@ -7,11 +7,13 @@ public:
 	Pot(string nameIn);
 	~Pot(void);
 
-	int ammount;
+	double ammount;
 	string name;
 	vector<Player*> ableToWin;
 	vector<Player*> winners;
-	void addToPot(int ammountIn);
+	void addToPot(double ammountIn);
 	void printPot();
+	void addEligiblePlayer(Player* playerIn);
+	void rmEligiblePlayer(int playerNum);
 };
 

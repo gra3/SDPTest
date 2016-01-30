@@ -18,6 +18,10 @@ void PotManager::makeMainPot()
 	{
 		pot.push_back(Pot("main"));
 	}
+	for(int i=0;i<allPlayers->size();i++)
+	{
+		if(allPlayers->at(i).isActive()&&allPlayers->at(i).isStillInRound) pot[0].addEligiblePlayer(&allPlayers->at(i));
+	}
 }
 
 void PotManager::makeSidePot()
@@ -38,4 +42,21 @@ void PotManager::printPots()
 		pot[i].printPot();
 	}
 	cout << endl;
+}
+
+void PotManager::add(double ammountIn)
+{
+	if(pot.size()==0) cout << "Error: No pots created!!!\n";
+	else if(pot.size()==1)
+	{
+		pot[0].addToPot(ammountIn);
+	}
+}
+
+void PotManager::fold(int playerNum)
+{
+	for(int i=0;i<pot.size();i++)
+	{
+		pot[i].rmEligiblePlayer(playerNum);
+	}
 }

@@ -451,9 +451,11 @@ void Game::start()
 							player[i].findNextActive()->setBigBlind(true);
 						}
 					}
+
 					readWeightSensor();
 					//for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
 					for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
+
 					SDL_Delay(250);
 				}
 			}
@@ -462,12 +464,7 @@ void Game::start()
 
 			//*********************************************BLINDS*****************************************************
 			case BLINDS:
-
-			pots->makeMainPot();
-			pots->makeSidePot();
-			pots->makeSidePot();
-			pots->printPots();
-
+			
 			if(getCommand(command,ident)>=0)
 			{
 				//Buy-in
@@ -498,6 +495,7 @@ void Game::start()
 						player[i].currentBet = smallBlind;
 						player[i].lastCurrentBet = 0;
 						player[i].totalPutIntoPot += smallBlind;
+						
 					}
 					if(player[i].isBigBlind())
 					{
@@ -505,11 +503,18 @@ void Game::start()
 						player[i].currentBet = bigBlind;
 						player[i].lastCurrentBet = 0;
 						player[i].totalPutIntoPot += bigBlind;
+						
 					}
 				}
 				minToCall = bigBlind;
 				for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) player[i].isStillInRound = true;
 				for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
+
+				//Make Main pot and add blinds
+				pots->makeMainPot();
+				pots->add(smallBlind+bigBlind);
+				pots->printPots();
+
 				SDL_Delay(50);
 			}
 
@@ -517,7 +522,7 @@ void Game::start()
 
 			//*********************************************DEALING*****************************************************
 			case DEALING:
-			
+
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
 			player[0].hand[0].set(rRank(),rSuit());
 			player[0].hand[1].set(rRank(),rSuit());
@@ -661,6 +666,7 @@ void Game::start()
 						//Player Called
 						else if(player[bettingPlayerNumber].currentBet == minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
 						{
+							pots->add(player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet);
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							callCount++;
 							cout << "Player " << bettingPlayerNumber << " called for $" << player[bettingPlayerNumber].currentBet << endl;
@@ -680,6 +686,7 @@ void Game::start()
 						//Player Raised
 						else if(player[bettingPlayerNumber].currentBet >= 2*minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
 						{
+							pots->add(player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet);
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							callCount = 1;
 							cout << "Player " << bettingPlayerNumber << " raised $" << player[bettingPlayerNumber].currentBet-minToCall << endl;
@@ -701,6 +708,7 @@ void Game::start()
 					if(strcmp(command,"fold")==0)
 					{
 						cout << "Player " << bettingPlayerNumber << " folded!\n";
+						pots->fold(bettingPlayerNumber);
 						player[bettingPlayerNumber].isStillInRound = false;
 						player[bettingPlayerNumber].setBetting(false);
 						updatePlayer(bettingPlayerNumber);
@@ -727,6 +735,7 @@ void Game::start()
 			//If all called, end the round of betting
 			if(callCount == numberStillInRound()-numberAllIn())
 			{
+				pots->printPots();
 				bettingRound++;
 				cout << "BETTING ROUND: " << bettingRound << endl;
 				minToCall = 0;
