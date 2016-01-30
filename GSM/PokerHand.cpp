@@ -681,23 +681,24 @@ void PokerHand::printBestHand()
 
 bool PokerHand::operator==(const PokerHand &other)
 {
-	if(handRank==other.handRank&&
+	if(handRank==1&&other.handRank==1)
+	{
+		if(highCard==other.highCard&&kicker==other.kicker) return true;
+		else return false;
+	}
+	else if(handRank==other.handRank&&
 	   bestFive[0].rank==other.bestFive[0].rank&&
 	   bestFive[1].rank==other.bestFive[1].rank&&
 	   bestFive[2].rank==other.bestFive[2].rank&&
 	   bestFive[3].rank==other.bestFive[3].rank&&
 	   bestFive[4].rank==other.bestFive[4].rank) return true;
-	else if(handRank==1&&other.handRank==1)
-	{
-		if(highCard==other.highCard&&kicker==other.kicker) return true;
-		else return false;
-	}
 	else return false;
 }
 
 bool PokerHand::operator<(const PokerHand &other)
 {
-	if(*this==other) return false;
+	cout << "1\n";
+	//if(*this==other) return false;
 	vector<Card> tempHand = other.bestFive;
 	if(handRank>other.handRank) return false;
 	else if(other.handRank>handRank) return true;

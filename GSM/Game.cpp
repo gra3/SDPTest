@@ -435,18 +435,18 @@ void Game::start()
 			case DEALING:
 			
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
-			player[0].hand[0].set(rRank(),rSuit());
-			player[0].hand[1].set(rRank(),rSuit());
+			player[0].hand[0].set(2,1);
+			player[0].hand[1].set(3,2);
 			player[0].fullHand.addCard(player[0].hand[0]);
 			player[0].fullHand.addCard(player[0].hand[1]);
 
-			player[1].hand[0].set(rRank(),rSuit());
-			player[1].hand[1].set(rRank(),rSuit());
+			player[1].hand[0].set(2,3);
+			player[1].hand[1].set(4,2);
 			player[1].fullHand.addCard(player[1].hand[0]);
 			player[1].fullHand.addCard(player[1].hand[1]);
 
-			player[2].hand[0].set(rRank(),rSuit());
-			player[2].hand[1].set(rRank(),rSuit());
+			player[2].hand[0].set(3,2);
+			player[2].hand[1].set(5,0);
 			player[2].fullHand.addCard(player[2].hand[0]);
 			player[2].fullHand.addCard(player[2].hand[1]);
 
@@ -699,9 +699,9 @@ void Game::start()
 			cout << "Now in Community Card State\n";
 			if(bettingRound==2)
 			{
-				commCard[0].set(rRank(),rSuit());
-				commCard[1].set(rRank(),rSuit());
-				commCard[2].set(rRank(),rSuit());
+				commCard[0].set(7,1);
+				commCard[1].set(9,3);
+				commCard[2].set(10,2);
 				player[0].fullHand.addCard(commCard[0]);
 				player[0].fullHand.addCard(commCard[1]);
 				player[0].fullHand.addCard(commCard[2]);
@@ -716,7 +716,7 @@ void Game::start()
 
 			if(bettingRound==3)
 			{
-				commCard[3].set(rRank(),rSuit());
+				commCard[3].set(12,1);
 				player[0].fullHand.addCard(commCard[3]);
 				player[1].fullHand.addCard(commCard[3]);
 				player[2].fullHand.addCard(commCard[3]);
@@ -725,7 +725,7 @@ void Game::start()
 
 			if(bettingRound==4)
 			{
-				commCard[4].set(rRank(),rSuit());
+				commCard[4].set(14,0);
 				player[0].fullHand.addCard(commCard[4]);
 				player[1].fullHand.addCard(commCard[4]);
 				player[2].fullHand.addCard(commCard[4]);
@@ -828,6 +828,7 @@ void Game::start()
 				if(player[1].fullHand<player[0].fullHand) cout <<  "1<0";
 				if(player[0].fullHand<player[1].fullHand) cout <<  "1<2";
 
+				
 				Player* highest = unsortedPossibleWinner[0];
 				winner.push_back(unsortedPossibleWinner[0]);
 				for(int i=1;i<unsortedPossibleWinner.size();i++)
@@ -844,7 +845,7 @@ void Game::start()
 					}
 				}
 
-
+				cout << "size of Winner vector: " << winner.size() << endl;
 				cout << "Number of Winners: " << winner.size() << endl;
 				for(int i=0;i<winner.size();i++)
 				{
