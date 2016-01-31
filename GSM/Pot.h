@@ -16,8 +16,9 @@ public:
 	void rmFromPot(double ammountIn);
 	void printPot();
 	void addEligiblePlayer(Player* playerIn);
-	void rmEligiblePlayer(int playerNum);
+	bool rmEligiblePlayer(int playerNum);
 	void sortPokerHands();
 	void distributePot();
+	void reset();
 };
 

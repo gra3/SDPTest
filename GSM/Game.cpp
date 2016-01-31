@@ -513,18 +513,18 @@ void Game::start()
 			case DEALING:
 
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
-			player[0].hand[0].set(rRank(),rSuit());
-			player[0].hand[1].set(rRank(),rSuit());
+			player[0].hand[0].set(12,0);
+			player[0].hand[1].set(7,1);
 			player[0].fullHand.addCard(player[0].hand[0]);
 			player[0].fullHand.addCard(player[0].hand[1]);
 
-			player[1].hand[0].set(rRank(),rSuit());
-			player[1].hand[1].set(rRank(),rSuit());
+			player[1].hand[0].set(12,3);
+			player[1].hand[1].set(12,1);
 			player[1].fullHand.addCard(player[1].hand[0]);
 			player[1].fullHand.addCard(player[1].hand[1]);
 
-			player[2].hand[0].set(rRank(),rSuit());
-			player[2].hand[1].set(rRank(),rSuit());
+			player[2].hand[0].set(3,2);
+			player[2].hand[1].set(12,3);
 			player[2].fullHand.addCard(player[2].hand[0]);
 			player[2].fullHand.addCard(player[2].hand[1]);
 
@@ -703,7 +703,7 @@ void Game::start()
 						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
 						bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-						if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
+						if(callCount != numberStillInRound()-numberAllIn()&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
 						potLastBet = potTotal;
 						player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 						updatePlayer(bettingPlayerNumber);
@@ -723,9 +723,10 @@ void Game::start()
 
 
 			//Skip Future betting
-			if(numberStillInRound()>1&&numberAbleToBet()==1&&(callCount == (numberStillInRound()-numberAllIn())))
+			//if(numberStillInRound()>1&&numberAbleToBet()==1&&(callCount == (numberStillInRound()-numberAllIn())))
+			if(numberStillInRound()>1&&numberAbleToBet()==1)
 			{
-				//bettingRound++;
+				bettingRound++;
 				pots->printPots();
 				for(int i=0;i<numberOfPlayers; i++) player[i].setBetting(false);
 				cout << "BYPASS!!!\n"  << endl;
@@ -783,9 +784,9 @@ void Game::start()
 			cout << "Now in Community Card State\n";
 			if(bettingRound==2)
 			{
-				commCard[0].set(rRank(),rSuit());
-				commCard[1].set(rRank(),rSuit());
-				commCard[2].set(rRank(),rSuit());
+				commCard[0].set(10,0);
+				commCard[1].set(10,1);
+				commCard[2].set(6,2);
 				player[0].fullHand.addCard(commCard[0]);
 				player[0].fullHand.addCard(commCard[1]);
 				player[0].fullHand.addCard(commCard[2]);
@@ -800,7 +801,7 @@ void Game::start()
 
 			if(bettingRound==3)
 			{
-				commCard[3].set(rRank(),rSuit());
+				commCard[3].set(6,3);
 				player[0].fullHand.addCard(commCard[3]);
 				player[1].fullHand.addCard(commCard[3]);
 				player[2].fullHand.addCard(commCard[3]);
@@ -809,7 +810,7 @@ void Game::start()
 
 			if(bettingRound==4)
 			{
-				commCard[4].set(rRank(),rSuit());
+				commCard[4].set(6,0);
 				player[0].fullHand.addCard(commCard[4]);
 				player[1].fullHand.addCard(commCard[4]);
 				player[2].fullHand.addCard(commCard[4]);

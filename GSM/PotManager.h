@@ -13,6 +13,7 @@ public:
 
 	void makeMainPot();
 	void makeSidePot();
+	void rmSidePot(int sidePotNumber);
 	void printPots();
 	void add(double ammountIn);
 	void fold(int playerNum);

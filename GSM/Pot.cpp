@@ -36,7 +36,8 @@ void Pot::addEligiblePlayer(Player* playerIn)
 	ableToWin.push_back(playerIn);
 }
 
-void Pot::rmEligiblePlayer(int playerNum)
+//returns true if pot needs deleted
+bool Pot::rmEligiblePlayer(int playerNum)
 {
 	int toBeRemoved = -1;
 	for(int i=0;i<ableToWin.size();i++)
@@ -48,6 +49,8 @@ void Pot::rmEligiblePlayer(int playerNum)
 	{
 		ableToWin.erase(ableToWin.begin()+toBeRemoved);
 	}
+	if(ableToWin.size()==0) return true;
+	else return false;
 }
 
 void Pot::sortPokerHands()
@@ -72,33 +75,52 @@ void Pot::distributePot()
 {
 	cout << "////////// Distributing Pot " << name << " //////////////" << endl;
 
-	int winnerCount = 1;
-	for(int i=sorted.size()-1;i>0;i--)
+	if(ableToWin.size()==1) 
 	{
-		if(sorted[i].fullHand==sorted[i-1].fullHand) winnerCount++;
+		ableToWin.at(0)->chipTotal += ammount;
+		cout << "Player " << ableToWin.at(0)->getPlayerNumber() << " awarded $" << ammount << endl;
 	}
-
-	vector<int> winningPlayerNumbers;
-	for(int i=0;i<winnerCount;i++)
+	else
 	{
-		winningPlayerNumbers.push_back(sorted[sorted.size()-1+i].getPlayerNumber());
-	}
-	for(int i=0;i<winningPlayerNumbers.size();i++) cout << winningPlayerNumbers[i] << "  ";
-	cout << endl;
-
-	for(int i=0;i<winningPlayerNumbers.size();i++)
-	{
-		for(int j=0;j<ableToWin.size();j++)
+		cout << "Winner Count\n";
+		int winnerCount = 1;
+		for(int i=sorted.size()-1;i>0;i--)
 		{
-			if(ableToWin.at(j)->getPlayerNumber()==winningPlayerNumbers[i]) winners.push_back(ableToWin.at(j));
+			if(sorted[sorted.size()-1].fullHand==sorted[i-1].fullHand) winnerCount++;
+		}
+		cout << "Winner Count equals === " << winnerCount << endl;
+		cout << "Sorted size()    " << sorted.size() << endl;
+		cout << "Getting Winning Player Numbers\n";
+		vector<int> winningPlayerNumbers;
+		for(int i=0;i<winnerCount;i++)
+		{
+			cout << "i = " << i << endl;
+			cout << "sorted.size()-1+i  =  " << sorted.size()-1+i << endl;
+			winningPlayerNumbers.push_back(sorted[sorted.size()-1-i].getPlayerNumber());
+		}
+
+		cout << "Making vector of winners\n";
+		for(int i=0;i<winningPlayerNumbers.size();i++)
+		{
+			for(int j=0;j<ableToWin.size();j++)
+			{
+				if(ableToWin.at(j)->getPlayerNumber()==winningPlayerNumbers[i]) winners.push_back(ableToWin.at(j));
+			}
+		}
+
+		cout << "Splitting pot amongst winners\n";
+		double ammountAwarded = ammount/winnerCount;
+		for(int i=0;i<winners.size();i++)
+		{
+			winners.at(i)->chipTotal += ammountAwarded;
+			cout << "Player " << winners.at(i)->getPlayerNumber() << " awarded $" << ammountAwarded << endl;
 		}
 	}
+}
 
-	double ammountAwarded = ammount/winnerCount;
-	for(int i=0;i<winners.size();i++)
-	{
-		winners.at(i)->chipTotal += ammountAwarded;
-		cout << "Player " << winners.at(i)->getPlayerNumber() << " awarded $" << ammountAwarded << endl;
-	}
-
+void Pot::reset()
+{
+	ableToWin.clear();
+	winners.clear();
+	sorted.clear();
 }

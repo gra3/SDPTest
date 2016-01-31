@@ -54,11 +54,17 @@ void PotManager::add(double ammountIn)
 	}
 }
 
+void PotManager::rmSidePot(int sidePotNumber)
+{
+	pot[sidePotNumber-1].ammount += pot[sidePotNumber].ammount;
+	pot.erase(pot.begin() + sidePotNumber);
+}
+
 void PotManager::fold(int playerNum)
 {
 	for(int i=0;i<pot.size();i++)
 	{
-		pot[i].rmEligiblePlayer(playerNum);
+		if(pot[i].rmEligiblePlayer(playerNum)) rmSidePot(i);
 	}
 }
 
@@ -131,6 +137,7 @@ void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
 
 void PotManager::reset()
 {
+	for(int i=0;i<pot.size();i++) pot[i].reset();
 	pot.clear();
 }
 
