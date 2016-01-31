@@ -824,7 +824,11 @@ void Game::start()
 				bettingPlayer = NULL;
 				SDL_Delay(50);
 			}
-			if(bettingBypass) for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
+			if(bettingBypass)
+			{
+				for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
+				state = HANDRES;
+			}
 			SDL_Delay(100);
 			break;
 
