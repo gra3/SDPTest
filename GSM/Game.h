@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "Deck.h"
 #include "PokerHand.h"
+#include "PotManager.h"
 
 enum s {START,BLINDS,DEALING,BETTING,COMMCARD,HANDRES,CLEANUP};
 
@@ -31,6 +32,7 @@ public:
 	Player* bettingPlayer;
 	int callCount;
 	bool bettingBypass;
+	PotManager* pots;
 
 	Game(int numPlayers, double sB, double bB, double buy);
 	~Game(void);
@@ -52,5 +54,10 @@ public:
 	void resetNewHand();
 	int rRank();
 	int rSuit();
+	void calcActiveHands();
+	int calcHighestRank();
+	int numberWithHighestRank(int highestRank);
+	void calcPots();
+	vector<Player> sortPokerHands();
 };
 

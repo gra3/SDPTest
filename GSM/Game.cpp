@@ -47,6 +47,9 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 	}
 	cout << "All Players Connected!!!\n";
 
+	//Initialize PotManager
+	pots = new PotManager(&player,&minToCall);
+
 	//Initialize commCards
 	commCard[0] = Card(0,0);
 	commCard[1] = Card(0,0);
@@ -311,6 +314,70 @@ void Game::resetNewHand()
 	bettingBypass = false;
 	callCount = 0;
 	deck.resetDeck();
+	pots->reset();
+}
+
+void Game::calcActiveHands()
+{
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isActive()&&player[i].isStillInRound) player[i].fullHand.calcHandRank();
+	}
+}
+
+int Game::calcHighestRank()
+{
+	int highestRank = 0;
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].fullHand.handRank>highestRank&&player[i].isStillInRound)
+		{
+			highestRank = player[i].fullHand.handRank;
+		}
+	}
+	return highestRank;
+}
+
+int Game::numberWithHighestRank(int highestRank)
+{
+	int count = 0;
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isStillInRound&&player[i].fullHand.handRank==highestRank) count++;
+	}
+	return count;
+}
+
+void Game::calcPots()
+{
+	vector<double> totalPutIn;
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isActive()&&player[i].isStillInRound) totalPutIn.push_back(player[i].totalPutIntoPot);
+	}
+	int min = totalPutIn[0];
+	for(int i=0;i<totalPutIn.size();i++)
+	{
+		if(totalPutIn[i]<min) min = totalPutIn[i];
+	}
+	for(int i=0;i<totalPutIn.size();i++)
+	{
+		cout << totalPutIn[i] << "  ";
+	}
+	cout << "\nMin Main pot: " << min << endl;
+}
+
+vector<Player> Game::sortPokerHands()
+{
+	cout << "/////////////////Sort PokerHands Begin/////////////////////////\n";
+	vector<Player> sortedPlayerHands;
+	for(int i=0;i<numberOfPlayers;i++) sortedPlayerHands.push_back(player[i]);
+	sort(sortedPlayerHands.begin(), sortedPlayerHands.end());
+	cout << "Sorted PokerHands (low to high): ";
+	for(int i = 0;i<sortedPlayerHands.size();i++) cout << "Player " << sortedPlayerHands[i].getPlayerNumber() << "   ";
+	cout << endl;
+	cout << "/////////////////Sort PokerHands End/////////////////////////\n";
+	return sortedPlayerHands;
 }
 
 void Game::start()
@@ -372,9 +439,11 @@ void Game::start()
 							player[i].findNextActive()->setBigBlind(true);
 						}
 					}
+
 					readWeightSensor();
 					//for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
 					for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
+
 					SDL_Delay(250);
 				}
 			}
@@ -383,7 +452,7 @@ void Game::start()
 
 			//*********************************************BLINDS*****************************************************
 			case BLINDS:
-
+			
 			if(getCommand(command,ident)>=0)
 			{
 				//Buy-in
@@ -414,6 +483,7 @@ void Game::start()
 						player[i].currentBet = smallBlind;
 						player[i].lastCurrentBet = 0;
 						player[i].totalPutIntoPot += smallBlind;
+						
 					}
 					if(player[i].isBigBlind())
 					{
@@ -421,11 +491,19 @@ void Game::start()
 						player[i].currentBet = bigBlind;
 						player[i].lastCurrentBet = 0;
 						player[i].totalPutIntoPot += bigBlind;
+						
 					}
 				}
 				minToCall = bigBlind;
 				for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) player[i].isStillInRound = true;
 				for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
+
+				//Make Main pot and add blinds
+				pots->makeMainPot();
+				pots->add(smallBlind);
+				pots->add(bigBlind);
+				pots->printPots();
+
 				SDL_Delay(50);
 			}
 
@@ -433,20 +511,20 @@ void Game::start()
 
 			//*********************************************DEALING*****************************************************
 			case DEALING:
-			
+
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
-			player[0].hand[0].set(2,1);
-			player[0].hand[1].set(3,2);
+			player[0].hand[0].set(rRank(),rSuit());
+			player[0].hand[1].set(rRank(),rSuit());
 			player[0].fullHand.addCard(player[0].hand[0]);
 			player[0].fullHand.addCard(player[0].hand[1]);
 
-			player[1].hand[0].set(2,3);
-			player[1].hand[1].set(4,2);
+			player[1].hand[0].set(rRank(),rSuit());
+			player[1].hand[1].set(rRank(),rSuit());
 			player[1].fullHand.addCard(player[1].hand[0]);
 			player[1].fullHand.addCard(player[1].hand[1]);
 
-			player[2].hand[0].set(3,2);
-			player[2].hand[1].set(5,0);
+			player[2].hand[0].set(rRank(),rSuit());
+			player[2].hand[1].set(rRank(),rSuit());
 			player[2].fullHand.addCard(player[2].hand[0]);
 			player[2].fullHand.addCard(player[2].hand[1]);
 
@@ -553,13 +631,13 @@ void Game::start()
 						if((player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet)==player[bettingPlayerNumber].chipTotal)
 						{
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
-						
 							cout << "Player " << bettingPlayerNumber << " went all in for $" << player[bettingPlayerNumber].currentBet << endl;
 							player[bettingPlayerNumber].chipTotal -= player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							if(player[bettingPlayerNumber].chipTotal == 0) player[bettingPlayerNumber].isAllIn = true;
 							//minToCall = player[bettingPlayerNumber].currentBet;
 							player[bettingPlayerNumber].setBetting(false);
-							callCount++;
+							//callCount++;
+							pots->allIn(bettingPlayerNumber,player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet,callCount);
 							if(player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet > minToCall)
 							{
 								minToCall = player[bettingPlayerNumber].currentBet;
@@ -568,7 +646,7 @@ void Game::start()
 
 							updatePlayer(bettingPlayerNumber);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
@@ -577,6 +655,7 @@ void Game::start()
 						//Player Called
 						else if(player[bettingPlayerNumber].currentBet == minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
 						{
+							pots->call(player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet);
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							callCount++;
 							cout << "Player " << bettingPlayerNumber << " called for $" << player[bettingPlayerNumber].currentBet << endl;
@@ -586,7 +665,7 @@ void Game::start()
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
@@ -596,6 +675,7 @@ void Game::start()
 						//Player Raised
 						else if(player[bettingPlayerNumber].currentBet >= 2*minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
 						{
+							pots->raise(player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet,bettingRound,bettingPlayerNumber);
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							callCount = 1;
 							cout << "Player " << bettingPlayerNumber << " raised $" << player[bettingPlayerNumber].currentBet-minToCall << endl;
@@ -606,7 +686,7 @@ void Game::start()
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
@@ -617,19 +697,20 @@ void Game::start()
 					if(strcmp(command,"fold")==0)
 					{
 						cout << "Player " << bettingPlayerNumber << " folded!\n";
+						pots->fold(bettingPlayerNumber);
 						player[bettingPlayerNumber].isStillInRound = false;
 						player[bettingPlayerNumber].setBetting(false);
 						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
 						bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-						if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
+						if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
 						potLastBet = potTotal;
 						player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
 					}
 
-					cout << "Call count: " << callCount << "   " << "Number in Round: " << numberStillInRound() << "Able to bet: " << numberAbleToBet() << endl;
+					cout << "Call count: " << callCount << "  Number in Round: " << numberStillInRound() << "  Able to bet: " << numberAbleToBet() << "  Num All In: " << numberAllIn() << endl;
 
 					//Buy-in
 					if(strcmp(command,"buyIn")==0)
@@ -640,9 +721,22 @@ void Game::start()
 
 				}
 
-			//If all called, end the round of betting
-			if(callCount == numberStillInRound()-numberAllIn())
+
+			//Skip Future betting
+			if(numberStillInRound()>1&&numberAbleToBet()==1&&(callCount == (numberStillInRound()-numberAllIn())))
 			{
+				//bettingRound++;
+				pots->printPots();
+				for(int i=0;i<numberOfPlayers; i++) player[i].setBetting(false);
+				cout << "BYPASS!!!\n"  << endl;
+				bettingBypass = true;
+				state = COMMCARD;
+				SDL_Delay(50);
+			}
+			//If all called, end the round of betting
+			else if(callCount == numberStillInRound()-numberAllIn())
+			{
+				pots->printPots();
 				bettingRound++;
 				cout << "BETTING ROUND: " << bettingRound << endl;
 				minToCall = 0;
@@ -657,24 +751,14 @@ void Game::start()
 				SDL_Delay(100);
 				//break;
 			}
-
 			//If only 1 still in round
-			if(numberStillInRound()==1)
+			else if(numberStillInRound()==1)
 			{
+				pots->printPots();
 				for(int i=0;i<numberOfPlayers; i++) player[i].setBetting(false);
+				cout << "ONLY ONE IN ROUND!!!\n";
 				updatePlayer(bettingPlayerNumber);
 				state = HANDRES;
-				SDL_Delay(50);
-			}
-
-			//Skip Future betting
-			if(numberStillInRound()>1&&numberAbleToBet()==1)
-			{
-				//bettingRound++;
-				for(int i=0;i<numberOfPlayers; i++) player[i].setBetting(false);
-				cout << "BYPASS!!!\n"  << endl;
-				bettingBypass = true;
-				state = COMMCARD;
 				SDL_Delay(50);
 			}
 
@@ -699,9 +783,9 @@ void Game::start()
 			cout << "Now in Community Card State\n";
 			if(bettingRound==2)
 			{
-				commCard[0].set(7,1);
-				commCard[1].set(9,3);
-				commCard[2].set(10,2);
+				commCard[0].set(rRank(),rSuit());
+				commCard[1].set(rRank(),rSuit());
+				commCard[2].set(rRank(),rSuit());
 				player[0].fullHand.addCard(commCard[0]);
 				player[0].fullHand.addCard(commCard[1]);
 				player[0].fullHand.addCard(commCard[2]);
@@ -716,7 +800,7 @@ void Game::start()
 
 			if(bettingRound==3)
 			{
-				commCard[3].set(12,1);
+				commCard[3].set(rRank(),rSuit());
 				player[0].fullHand.addCard(commCard[3]);
 				player[1].fullHand.addCard(commCard[3]);
 				player[2].fullHand.addCard(commCard[3]);
@@ -725,7 +809,7 @@ void Game::start()
 
 			if(bettingRound==4)
 			{
-				commCard[4].set(14,0);
+				commCard[4].set(rRank(),rSuit());
 				player[0].fullHand.addCard(commCard[4]);
 				player[1].fullHand.addCard(commCard[4]);
 				player[2].fullHand.addCard(commCard[4]);
@@ -759,118 +843,15 @@ void Game::start()
 
 			cout << "Now in Hand Resolution State\n";
 
-			int highestRank = 0;
-			int numWithHighestRank = 0;
+			calcActiveHands();
+			int highestRank = calcHighestRank();
+			int numWithHighestRank = numberWithHighestRank(highestRank);
 
-			//Calculate Hands for each player still in game
-			// and determine the highest rank among players and how many have it
-			for(int i=0;i<numberOfPlayers;i++)
-			{
-				if(player[i].isActive()&&player[i].isStillInRound)
-				{
-					player[i].fullHand.calcHandRank();
-					//player[i].fullHand.printBestHand();
-					if(player[i].fullHand.handRank>highestRank&&player[i].isStillInRound)
-					{
-						highestRank = player[i].fullHand.handRank;
-						numWithHighestRank = 1;
-					}
-					else if(player[i].fullHand.handRank==highestRank&&player[i].isStillInRound)
-					{
-						numWithHighestRank++;
-					}
-				}
-			}
+			pots->determineWinners();
+			pots->distributePots();
 
-			//Flag Possible Winning Players
-			for(int i=0;i<numberOfPlayers;i++)
-			{
-				if(player[i].fullHand.handRank == highestRank&&player[i].isStillInRound)
-				{
-					player[i].possibleWinner=true;
-					cout << "Player " << i << " possible winner\n";
-				}
-				
-			}
-
-			//STL sort test
-			cout << "/////////////////Sort Test Begin/////////////////////////\n";
-			vector<Player> sortTestPlayer;
-			for(int i=0;i<numberOfPlayers;i++) sortTestPlayer.push_back(player[i]);
-
-			for(int i = 0;i<numberOfPlayers;i++) cout << sortTestPlayer[i].getPlayerNumber() << " ";
-			cout << endl;
-			sort(sortTestPlayer.begin(), sortTestPlayer.end());
-			for(int i = 0;i<numberOfPlayers;i++) cout << sortTestPlayer[i].getPlayerNumber() << " ";
-			cout << endl;
-			cout << "/////////////////Sort Test End/////////////////////////\n";
-
-			vector<Player*> winner;
-			//If only 1 possible winner
-			if(numWithHighestRank==1)
-			{
-				int winningPlayerNumber;
-				for(int i=0;i<numberOfPlayers;i++) if(player[i].possibleWinner) winningPlayerNumber = i;
-				cout << "Player " << winningPlayerNumber << " wins with\n";
-				player[winningPlayerNumber].fullHand.printBestHand();
-				winner.push_back(&player[winningPlayerNumber]);
-			}
-			//2 or more possible winners
-			else
-			{
-				vector<Player*> unsortedPossibleWinner;
-				for(int i=0;i<numberOfPlayers;i++)
-				{
-					if(player[i].possibleWinner) unsortedPossibleWinner.push_back(&player[i]);
-				}
-
-				for(int i=0;i<unsortedPossibleWinner.size();i++) unsortedPossibleWinner[i]->fullHand.printBestHand();
-				if(player[1].fullHand<player[0].fullHand) cout <<  "1<0";
-				if(player[0].fullHand<player[1].fullHand) cout <<  "1<2";
-
-				
-				Player* highest = unsortedPossibleWinner[0];
-				winner.push_back(unsortedPossibleWinner[0]);
-				for(int i=1;i<unsortedPossibleWinner.size();i++)
-				{
-					if(highest->fullHand < unsortedPossibleWinner[i]->fullHand&&!(highest->fullHand==unsortedPossibleWinner[i]->fullHand))
-					{
-						winner.clear();
-						highest = unsortedPossibleWinner[i];
-						winner.push_back(unsortedPossibleWinner[i]);
-					}
-					else if(highest->fullHand==unsortedPossibleWinner[i]->fullHand)
-					{
-						winner.push_back(unsortedPossibleWinner[i]);
-					}
-				}
-
-				cout << "size of Winner vector: " << winner.size() << endl;
-				cout << "Number of Winners: " << winner.size() << endl;
-				for(int i=0;i<winner.size();i++)
-				{
-					cout << "Player " << winner[i]->getPlayerNumber() << " won\n";
-					winner[i]->fullHand.printBestHand();
-				}
-			}
-
-			//1 Winner
-			if(winner.size()==1||numWithHighestRank==1)
-			{
-				winner[0]->chipTotal+=potTotal;
-				updatePlayer(winner[0]->getPlayerNumber());
-				SDL_Delay(50);
-			}
-			//More than 1 Winner
-			else
-			{
-				for(int i=0;i<winner.size();i++)
-				{
-					winner[i]->chipTotal += potTotal/(winner.size());
-					updatePlayer(i);
-					SDL_Delay(50);
-				}
-			}
+			for(int i=0;i<player.size();i++) if(player[i].isActive()) updatePlayer(i);
+			SDL_Delay(50);
 
 			state = CLEANUP;
 			break;
