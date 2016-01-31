@@ -62,6 +62,35 @@ void PotManager::fold(int playerNum)
 	}
 }
 
+void PotManager::call(double ammount)
+{
+	if(pot.size()==1) pot[0].addToPot(ammount);
+	else if(pot.size()>1&&pot[pot.size()-1].ammount==0)
+	{
+		pot[pot.size()-2].addToPot(ammount);
+	}
+	else if(pot.size()>1&&pot[pot.size()-1].ammount!=0)
+	{
+		pot[pot.size()-1].addToPot(ammount);
+	}
+}
+
+void PotManager::raise(double ammount, int bettingRound, int playerNum)
+{
+	double blindAdjust = 0;
+	if(bettingRound==1)
+	{
+		if(allPlayers->at(playerNum).isSmallBlind()) blindAdjust = .25;
+		else if(allPlayers->at(playerNum).isBigBlind()) blindAdjust = .5;
+	}
+	if(pot.size()==1) pot[0].addToPot(ammount);
+	else if(pot.size()>1)
+	{
+		pot[pot.size()-1].addToPot(ammount-*minCall);
+		pot[pot.size()-2].addToPot(ammount-*minCall+blindAdjust);
+	}
+}
+
 void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
 {
 	//Make new sidepot
@@ -85,6 +114,10 @@ void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
 		rmFromPrevPot = *minCall - ammountIn;
 		pot[pot.size()-2].rmFromPot(rmFromPrevPot);
 		pot[pot.size()-1].addToPot(rmFromPrevPot);
+	}
+	else if(*minCall<ammountIn)
+	{
+		pot[pot.size()-2].addToPot(ammountIn);
 	}
 	else if(*minCall==ammountIn)
 	{

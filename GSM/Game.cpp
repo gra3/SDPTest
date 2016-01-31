@@ -636,12 +636,13 @@ void Game::start()
 							//minToCall = player[bettingPlayerNumber].currentBet;
 							player[bettingPlayerNumber].setBetting(false);
 							callCount++;
+							pots->allIn(bettingPlayerNumber,player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet,callCount);
 							if(player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet > minToCall)
 							{
 								minToCall = player[bettingPlayerNumber].currentBet;
 								callCount = 0;
 							}
-							pots->allIn(bettingPlayerNumber,player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet,callCount);
+							//pots->allIn(bettingPlayerNumber,player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet,callCount);
 
 							updatePlayer(bettingPlayerNumber);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
@@ -654,7 +655,7 @@ void Game::start()
 						//Player Called
 						else if(player[bettingPlayerNumber].currentBet == minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
 						{
-							pots->add(player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet);
+							pots->call(player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet);
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							callCount++;
 							cout << "Player " << bettingPlayerNumber << " called for $" << player[bettingPlayerNumber].currentBet << endl;
@@ -664,7 +665,7 @@ void Game::start()
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
@@ -674,7 +675,7 @@ void Game::start()
 						//Player Raised
 						else if(player[bettingPlayerNumber].currentBet >= 2*minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
 						{
-							pots->add(player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet);
+							pots->raise(player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet,bettingRound,bettingPlayerNumber);
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							callCount = 1;
 							cout << "Player " << bettingPlayerNumber << " raised $" << player[bettingPlayerNumber].currentBet-minToCall << endl;
@@ -685,7 +686,7 @@ void Game::start()
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
@@ -702,7 +703,7 @@ void Game::start()
 						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
 						bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-						if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
+						if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
 						potLastBet = potTotal;
 						player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 						updatePlayer(bettingPlayerNumber);

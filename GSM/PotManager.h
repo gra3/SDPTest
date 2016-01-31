@@ -18,5 +18,7 @@ public:
 	void fold(int playerNum);
 	void allIn(int playerNum, double ammountIn, int numCalled);
 	void reset();
+	void call(double ammount);
+	void raise(double ammount, int bettingRound, int playerNum);
 };
 
