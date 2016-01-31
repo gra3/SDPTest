@@ -134,8 +134,6 @@ Player* Player::findNextActiveAndInRound()
 
 bool Player::operator<(const Player &other)
 {
-	cout << "HERE!!!!!\n";
-
 	if(fullHand.hand.size()==7)
 	{
 		if(fullHand<other.fullHand) return true;

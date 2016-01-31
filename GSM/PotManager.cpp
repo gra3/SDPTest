@@ -17,7 +17,7 @@ void PotManager::makeMainPot()
 	if(pot.size()>0) cout << "Error: Main pot already exists!!!\n";
 	else
 	{
-		pot.push_back(Pot("main"));
+		pot.push_back(Pot("Main"));
 	}
 	for(int i=0;i<allPlayers->size();i++)
 	{
@@ -30,7 +30,7 @@ void PotManager::makeSidePot()
 	if(pot.size()==0) cout << "Error: No main pot exists!!!\n";
 	else
 	{
-		string temp = "sidepot " + to_string(pot.size());
+		string temp = "Sidepot " + to_string(pot.size());
 		pot.push_back(Pot(temp));
 	}
 }
@@ -67,12 +67,10 @@ void PotManager::call(double ammount)
 	if(pot.size()==1) pot[0].addToPot(ammount);
 	else if(pot.size()>1&&pot[pot.size()-1].ammount==0)
 	{
-		cout << "NIGGERS 1\n";
 		pot[pot.size()-2].addToPot(ammount);
 	}
 	else if(pot.size()>1&&pot[pot.size()-1].ammount>0)
 	{
-		cout << "NIGGERS 2\n";
 		pot[pot.size()-1].addToPot(ammount);
 	}
 }
@@ -83,13 +81,11 @@ void PotManager::raise(double ammount, int bettingRound, int playerNum)
 	else if(*minCall==0) pot[pot.size()-1].addToPot(ammount);
 	else if(pot.size()>1&&pot[pot.size()-1].ammount==0)
 	{
-		cout << "BLACK PEOPLE 1\n";
 		pot[pot.size()-1].addToPot(ammount/2);
 		pot[pot.size()-2].addToPot(ammount/2);
 	}
 	else if(pot.size()>1&&pot[pot.size()-1].ammount>0)
 	{
-		cout << "BLACK PEOPLE 2\n";
 		pot[pot.size()-1].addToPot(ammount);
 	}
 }
@@ -136,4 +132,21 @@ void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
 void PotManager::reset()
 {
 	pot.clear();
+}
+
+void PotManager::determineWinners()
+{
+	//For each pot...
+	for(int i=0;i<pot.size();i++)
+	{
+		pot[i].sortPokerHands();
+	}
+}
+
+void PotManager::distributePots()
+{
+	for(int i=0;i<pot.size();i++)
+	{
+		pot[i].distributePot();
+	}
 }

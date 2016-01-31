@@ -20,5 +20,7 @@ public:
 	void reset();
 	void call(double ammount);
 	void raise(double ammount, int bettingRound, int playerNum);
+	void determineWinners();
+	void distributePots();
 };
 

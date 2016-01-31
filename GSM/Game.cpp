@@ -847,10 +847,11 @@ void Game::start()
 			int highestRank = calcHighestRank();
 			int numWithHighestRank = numberWithHighestRank(highestRank);
 
-			calcPots();
-			
-			vector<Player> sortedPokerHands = sortPokerHands();
+			pots->determineWinners();
+			pots->distributePots();
 
+			for(int i=0;i<player.size();i++) if(player[i].isActive()) updatePlayer(i);
+			SDL_Delay(50);
 
 			state = CLEANUP;
 			break;
