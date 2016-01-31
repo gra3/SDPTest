@@ -28,6 +28,7 @@ void Pot::printPot()
 	{
 		cout << ableToWin[i]->getPlayerNumber() << " ";
 	}
+	cout << endl;
 }
 
 void Pot::addEligiblePlayer(Player* playerIn)

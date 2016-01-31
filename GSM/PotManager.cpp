@@ -30,7 +30,7 @@ void PotManager::makeSidePot()
 	if(pot.size()==0) cout << "Error: No main pot exists!!!\n";
 	else
 	{
-		string temp = "sidepot " + to_string(pot.size()+1);
+		string temp = "sidepot " + to_string(pot.size());
 		pot.push_back(Pot(temp));
 	}
 }
@@ -67,27 +67,30 @@ void PotManager::call(double ammount)
 	if(pot.size()==1) pot[0].addToPot(ammount);
 	else if(pot.size()>1&&pot[pot.size()-1].ammount==0)
 	{
+		cout << "NIGGERS 1\n";
 		pot[pot.size()-2].addToPot(ammount);
 	}
-	else if(pot.size()>1&&pot[pot.size()-1].ammount!=0)
+	else if(pot.size()>1&&pot[pot.size()-1].ammount>0)
 	{
+		cout << "NIGGERS 2\n";
 		pot[pot.size()-1].addToPot(ammount);
 	}
 }
 
 void PotManager::raise(double ammount, int bettingRound, int playerNum)
 {
-	double blindAdjust = 0;
-	if(bettingRound==1)
-	{
-		if(allPlayers->at(playerNum).isSmallBlind()) blindAdjust = .25;
-		else if(allPlayers->at(playerNum).isBigBlind()) blindAdjust = .5;
-	}
 	if(pot.size()==1) pot[0].addToPot(ammount);
-	else if(pot.size()>1)
+	else if(*minCall==0) pot[pot.size()-1].addToPot(ammount);
+	else if(pot.size()>1&&pot[pot.size()-1].ammount==0)
 	{
-		pot[pot.size()-1].addToPot(ammount-*minCall);
-		pot[pot.size()-2].addToPot(ammount-*minCall+blindAdjust);
+		cout << "BLACK PEOPLE 1\n";
+		pot[pot.size()-1].addToPot(ammount/2);
+		pot[pot.size()-2].addToPot(ammount/2);
+	}
+	else if(pot.size()>1&&pot[pot.size()-1].ammount>0)
+	{
+		cout << "BLACK PEOPLE 2\n";
+		pot[pot.size()-1].addToPot(ammount);
 	}
 }
 
@@ -112,8 +115,12 @@ void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
 	if(*minCall>ammountIn)
 	{
 		rmFromPrevPot = *minCall - ammountIn;
-		pot[pot.size()-2].rmFromPot(rmFromPrevPot);
-		pot[pot.size()-1].addToPot(rmFromPrevPot);
+		cout << "mincall: " << *minCall << "   amountIn: " << ammountIn << endl;
+		cout << "removed from pprev pot : " << rmFromPrevPot << endl;
+		cout << "numcalled: " << numCalled << endl;
+		pot[pot.size()-2].rmFromPot(rmFromPrevPot*numCalled);
+		pot[pot.size()-1].addToPot(rmFromPrevPot*numCalled);
+		pot[pot.size()-2].addToPot(ammountIn);
 	}
 	else if(*minCall<ammountIn)
 	{

@@ -500,7 +500,8 @@ void Game::start()
 
 				//Make Main pot and add blinds
 				pots->makeMainPot();
-				pots->add(smallBlind+bigBlind);
+				pots->add(smallBlind);
+				pots->add(bigBlind);
 				pots->printPots();
 
 				SDL_Delay(50);
@@ -635,14 +636,13 @@ void Game::start()
 							if(player[bettingPlayerNumber].chipTotal == 0) player[bettingPlayerNumber].isAllIn = true;
 							//minToCall = player[bettingPlayerNumber].currentBet;
 							player[bettingPlayerNumber].setBetting(false);
-							callCount++;
+							//callCount++;
 							pots->allIn(bettingPlayerNumber,player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet,callCount);
 							if(player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet > minToCall)
 							{
 								minToCall = player[bettingPlayerNumber].currentBet;
 								callCount = 0;
 							}
-							//pots->allIn(bettingPlayerNumber,player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet,callCount);
 
 							updatePlayer(bettingPlayerNumber);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
@@ -655,7 +655,7 @@ void Game::start()
 						//Player Called
 						else if(player[bettingPlayerNumber].currentBet == minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
 						{
-							pots->call(player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet);
+							pots->call(player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet);
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							callCount++;
 							cout << "Player " << bettingPlayerNumber << " called for $" << player[bettingPlayerNumber].currentBet << endl;
