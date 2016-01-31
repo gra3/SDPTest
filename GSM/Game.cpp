@@ -373,19 +373,6 @@ vector<Player> Game::sortPokerHands()
 	vector<Player> sortedPlayerHands;
 	for(int i=0;i<numberOfPlayers;i++) sortedPlayerHands.push_back(player[i]);
 	sort(sortedPlayerHands.begin(), sortedPlayerHands.end());
-	vector<int> toBeErased;
-	for(int i=0;i<sortedPlayerHands.size();i++)
-	{
-		if(!sortedPlayerHands[i].isStillInRound)
-		{
-			toBeErased.push_back(i);
-		}
-	}
-
-	for(int i=0;i<toBeErased.size();i++)
-	{
-		sortedPlayerHands.erase(sortedPlayerHands.begin()+toBeErased[i]);
-	}
 	cout << "Sorted PokerHands (low to high): ";
 	for(int i = 0;i<sortedPlayerHands.size();i++) cout << "Player " << sortedPlayerHands[i].getPlayerNumber() << "   ";
 	cout << endl;
@@ -658,7 +645,7 @@ void Game::start()
 
 							updatePlayer(bettingPlayerNumber);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
@@ -722,7 +709,7 @@ void Game::start()
 						SDL_Delay(50);
 					}
 
-					cout << "Call count: " << callCount << "   " << "Number in Round: " << numberStillInRound() << "Able to bet: " << numberAbleToBet() << "Num All In: " << numberAllIn() << endl;
+					cout << "Call count: " << callCount << "  Number in Round: " << numberStillInRound() << "  Able to bet: " << numberAbleToBet() << "  Num All In: " << numberAllIn() << endl;
 
 					//Buy-in
 					if(strcmp(command,"buyIn")==0)
@@ -734,6 +721,17 @@ void Game::start()
 				}
 
 
+			//Skip Future betting
+			if(numberStillInRound()>1&&numberAbleToBet()==1&&(callCount == (numberStillInRound()-numberAllIn())))
+			{
+				//bettingRound++;
+				pots->printPots();
+				for(int i=0;i<numberOfPlayers; i++) player[i].setBetting(false);
+				cout << "BYPASS!!!\n"  << endl;
+				bettingBypass = true;
+				state = COMMCARD;
+				SDL_Delay(50);
+			}
 			//If all called, end the round of betting
 			else if(callCount == numberStillInRound()-numberAllIn())
 			{
@@ -760,17 +758,6 @@ void Game::start()
 				cout << "ONLY ONE IN ROUND!!!\n";
 				updatePlayer(bettingPlayerNumber);
 				state = HANDRES;
-				SDL_Delay(50);
-			}
-			//Skip Future betting
-			else if(numberStillInRound()>1&&numberAbleToBet()==1&&(callCount == (numberStillInRound()-numberAllIn())))
-			{
-				//bettingRound++;
-				pots->printPots();
-				for(int i=0;i<numberOfPlayers; i++) player[i].setBetting(false);
-				cout << "BYPASS!!!\n"  << endl;
-				bettingBypass = true;
-				state = COMMCARD;
 				SDL_Delay(50);
 			}
 
