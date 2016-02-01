@@ -83,6 +83,9 @@ void Game::initializeCameras()
 	cout << "All Cameras Initialized.\n";
 }
 
+
+///<summary>Initializes all cameras to the default camera</summary>
+///<returns>Zero</returns>
 void Game::initializeCamerasToZero()
 {
 	cout << "Initializing all cameras to ZERO...\n";
@@ -93,12 +96,15 @@ void Game::initializeCamerasToZero()
 	cout << "All Cameras Initialized to ZERO.\n";
 
 }
-
+///<summary>Returns a random valid card rank </summary>
+///<returns>int (2-14)</returns>
 int Game::rRank()
 {
 	return (rand() % 13) + 2;
 }
 
+///<summary>Returns a random valid card suit (0-3)</summary>
+///<returns>int (0-3)</returns>
 int Game::rSuit()
 {
 	return rand() % 4;
@@ -112,6 +118,8 @@ void Game::getHands()
 	}
 }
 
+///<summary>Returns true if all players have connected</summary>
+///<returns>Returns bool true if all players are connected, else false</returns>
 bool Game::allPlayersConnected()
 {
 	bool allConnected = true;
@@ -122,6 +130,8 @@ bool Game::allPlayersConnected()
 	return allConnected;
 }
 
+///<summary>Returns the number of active players</summary>
+///<returns>int == number of active players</returns>
 int Game::numActive()
 {
 	int activeCount = 0;
@@ -132,6 +142,9 @@ int Game::numActive()
 	return activeCount;
 }
 
+///<summary>Builds message of data to send to specified player</summary>
+///<param name="playerNum">The playerNumber that you wish to update</param>
+///<returns>Zero</returns>
 void Game::updatePlayer(int playerNum)
 {
 	string buildMsg;
@@ -196,11 +209,15 @@ void Game::updatePlayer(int playerNum)
 	if(sendClient(playerNum,outMsg)) cout << "Updated Player " << playerNum << endl;
 }
 
+///<summary>Calculates the total number of chips in the Pot</summary>
+///<returns>Total ammount in the Pot (double)</returns>
 double Game::calculatePot()
 {
 	return (chip_1_total*chip_1_value + chip_2_total*chip_2_value + chip_3_total*chip_3_value + chip_4_total*chip_4_value); 
 }
 
+///<summary>Reads the "weight sensor" from a file. Used for debugging</summary>
+///<returns>Value read from the "weight sensor"</returns>
 double Game::readWeightSensor()
 {
 	//Read playerNumber from file
@@ -220,12 +237,16 @@ double Game::readWeightSensor()
 	return potTotal;
 }
 
+///<summary>Returns true if the weight sensor reads smallBlind+bigBlind. Only to be used in blinds state</summary>
+///<returns>True if blinds are satisfied, else false</returns>
 bool Game::areBlindsSatisfied()
 {
 	if(readWeightSensor()==(bigBlind+smallBlind)) return true;
 	else return false;
 }
 
+///<summary>Returns the number of players still in the round</summary>
+///<returns>Number of players still in the round (int)</returns>
 int Game::numberStillInRound()
 {
 	int c = 0;
@@ -236,6 +257,8 @@ int Game::numberStillInRound()
 	return c;
 }
 
+///<summary>Returns the number of players still in the round and are able to bet</summary>
+///<returns>Number of players able to bet</returns>
 int Game::numberAbleToBet()
 {
 	int c = 0;
@@ -246,6 +269,8 @@ int Game::numberAbleToBet()
 	return c;
 }
 
+///<summary>Returns the number of players currently all in</summary>
+///<returns>Number of players all in</returns>
 int Game::numberAllIn()
 {
 	int c = 0;
@@ -256,6 +281,8 @@ int Game::numberAllIn()
 	return c;
 }
 
+///<summary>Resets all of the Players and game state variables for a new hand</summary>
+///<returns>Zero</returns>
 void Game::resetNewHand()
 {
 	for(int i=0; i<numberOfPlayers;i++)
@@ -317,6 +344,8 @@ void Game::resetNewHand()
 	pots->reset();
 }
 
+///<summary>Calculates the best hand for each player using the PokerHand class</summary>
+///<returns>Zero</returns>
 void Game::calcActiveHands()
 {
 	for(int i=0;i<numberOfPlayers;i++)
@@ -325,6 +354,8 @@ void Game::calcActiveHands()
 	}
 }
 
+///<summary>Calculates the highest handRank amongst the player</summary>
+///<returns>Number of the highest rank</returns>
 int Game::calcHighestRank()
 {
 	int highestRank = 0;
@@ -338,6 +369,9 @@ int Game::calcHighestRank()
 	return highestRank;
 }
 
+///<summary>Calculates the number of players who have the highest rank</summary>
+///<param name="highestRank">Highest hand rank. Use Game::calcHighestRank()</param>
+///<returns>Number of player who have the highest rank</returns>
 int Game::numberWithHighestRank(int highestRank)
 {
 	int count = 0;
@@ -348,38 +382,8 @@ int Game::numberWithHighestRank(int highestRank)
 	return count;
 }
 
-void Game::calcPots()
-{
-	vector<double> totalPutIn;
-	for(int i=0;i<numberOfPlayers;i++)
-	{
-		if(player[i].isActive()&&player[i].isStillInRound) totalPutIn.push_back(player[i].totalPutIntoPot);
-	}
-	int min = totalPutIn[0];
-	for(int i=0;i<totalPutIn.size();i++)
-	{
-		if(totalPutIn[i]<min) min = totalPutIn[i];
-	}
-	for(int i=0;i<totalPutIn.size();i++)
-	{
-		cout << totalPutIn[i] << "  ";
-	}
-	cout << "\nMin Main pot: " << min << endl;
-}
-
-vector<Player> Game::sortPokerHands()
-{
-	cout << "/////////////////Sort PokerHands Begin/////////////////////////\n";
-	vector<Player> sortedPlayerHands;
-	for(int i=0;i<numberOfPlayers;i++) sortedPlayerHands.push_back(player[i]);
-	sort(sortedPlayerHands.begin(), sortedPlayerHands.end());
-	cout << "Sorted PokerHands (low to high): ";
-	for(int i = 0;i<sortedPlayerHands.size();i++) cout << "Player " << sortedPlayerHands[i].getPlayerNumber() << "   ";
-	cout << endl;
-	cout << "/////////////////Sort PokerHands End/////////////////////////\n";
-	return sortedPlayerHands;
-}
-
+///<summary>the actual GSM - Main loop</summary>
+///<returns>Zero</returns>
 void Game::start()
 {
 	int ident = 0;
