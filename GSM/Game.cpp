@@ -629,10 +629,26 @@ void Game::start()
 						//else player[bettingPlayerNumber].currentBet += potTotal - potLastBet;
 						//updatePlayer(bettingPlayerNumber);
 						//SDL_Delay(100);
-
-						///////////////////////////////////////COULD HAVE ALL IN BUTTON///////////////////////////
-						//Player went all in
-						if((player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet)==player[bettingPlayerNumber].chipTotal)
+						cout << "MIN TO CALL" << minToCall << "   " <<  player[bettingPlayerNumber].currentBet << "   " << player[bettingPlayerNumber].chipTotal << endl;
+						if(player[bettingPlayerNumber].currentBet == minToCall&&player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet<=player[bettingPlayerNumber].chipTotal)
+						{
+							pots->call(player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet);
+							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
+							callCount++;
+							cout << "Player " << bettingPlayerNumber << " called for $" << player[bettingPlayerNumber].currentBet << endl;
+							player[bettingPlayerNumber].chipTotal -= player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
+							if(player[bettingPlayerNumber].chipTotal == 0) player[bettingPlayerNumber].isAllIn = true;
+							player[bettingPlayerNumber].setBetting(false);
+							updatePlayer(bettingPlayerNumber);
+							SDL_Delay(50);
+							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
+							potLastBet = potTotal;
+							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
+							updatePlayer(bettingPlayerNumber);
+							SDL_Delay(50);
+						}
+						else if((player[bettingPlayerNumber].currentBet-player[bettingPlayerNumber].lastCurrentBet)==player[bettingPlayerNumber].chipTotal)
 						{
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
 							cout << "Player " << bettingPlayerNumber << " went all in for $" << player[bettingPlayerNumber].currentBet << endl;
@@ -657,7 +673,7 @@ void Game::start()
 							SDL_Delay(50);
 						}
 						//Player Called
-						else if(player[bettingPlayerNumber].currentBet == minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
+						/*else if(player[bettingPlayerNumber].currentBet == minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
 						{
 							pots->call(player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet);
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
@@ -674,7 +690,7 @@ void Game::start()
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
-						}
+						}*/
 
 						//Player Raised
 						else if(player[bettingPlayerNumber].currentBet >= 2*minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
@@ -727,8 +743,7 @@ void Game::start()
 
 
 			//Skip Future betting
-			//if(numberStillInRound()>1&&numberAbleToBet()==1&&(callCount == (numberStillInRound()-numberAllIn())))
-			if(numberStillInRound()>1&&numberAbleToBet()==1)
+			if(numberStillInRound()>1&&numberAbleToBet()==1&&callCount==numberAbleToBet())
 			{
 				bettingRound++;
 				pots->printPots();
