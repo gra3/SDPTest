@@ -130,7 +130,7 @@ void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
 	}
 	else if(*minCall==ammountIn)
 	{
-		pot[pot.size()-1].addToPot(ammountIn);
+		pot[pot.size()-2].addToPot(ammountIn);
 	}
 
 }
@@ -152,6 +152,13 @@ void PotManager::determineWinners()
 
 void PotManager::distributePots()
 {
+	for(int i =0;i<pot.size();i++)
+	{
+		if(pot[i].ableToWin.size()==0)
+		{
+			pot.pop_back();
+		}
+	}
 	for(int i=0;i<pot.size();i++)
 	{
 		pot[i].distributePot();

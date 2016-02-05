@@ -485,7 +485,7 @@ void Game::start()
 					{
 						player[i].chipTotal -= smallBlind;
 						player[i].currentBet = smallBlind;
-						player[i].lastCurrentBet = 0;
+						player[i].lastCurrentBet = smallBlind;
 						player[i].totalPutIntoPot += smallBlind;
 						
 					}
@@ -650,14 +650,15 @@ void Game::start()
 
 							updatePlayer(bettingPlayerNumber);
 							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()) player[bettingPlayerNumber].setBetting(true);
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
 							potLastBet = potTotal;
 							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 						}
+						
 						//Player Called
-						else if(player[bettingPlayerNumber].currentBet == minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
+						else if(player[bettingPlayerNumber].currentBet == minToCall&&player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet<=player[bettingPlayerNumber].chipTotal)
 						{
 							pots->call(player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet);
 							player[bettingPlayerNumber].totalPutIntoPot += player[bettingPlayerNumber].currentBet - player[bettingPlayerNumber].lastCurrentBet;
@@ -675,7 +676,6 @@ void Game::start()
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 						}
-
 						//Player Raised
 						else if(player[bettingPlayerNumber].currentBet >= 2*minToCall&&player[bettingPlayerNumber].currentBet<=player[bettingPlayerNumber].chipTotal)
 						{
@@ -706,8 +706,13 @@ void Game::start()
 						player[bettingPlayerNumber].setBetting(false);
 						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
-						bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-						if(callCount != numberStillInRound()-numberAllIn()&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
+						//bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
+						if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>0&&numberStillInRound()!=1) 
+						{
+							cout << "HOW?E?E?E?E\n";
+							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
+							player[bettingPlayerNumber].setBetting(true);
+						}
 						potLastBet = potTotal;
 						player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
 						updatePlayer(bettingPlayerNumber);
@@ -728,7 +733,7 @@ void Game::start()
 
 			//Skip Future betting
 			//if(numberStillInRound()>1&&numberAbleToBet()==1&&(callCount == (numberStillInRound()-numberAllIn())))
-			if(numberStillInRound()>1&&numberAbleToBet()==1)
+			if((numberStillInRound()>1&&numberAbleToBet()==1&&callCount==numberAbleToBet())||numberAbleToBet()==0)
 			{
 				bettingRound++;
 				pots->printPots();
@@ -739,7 +744,7 @@ void Game::start()
 				SDL_Delay(50);
 			}
 			//If all called, end the round of betting
-			else if(callCount == numberStillInRound()-numberAllIn())
+			else if(callCount == numberStillInRound()-numberAllIn()&&numberStillInRound()!=1)
 			{
 				pots->printPots();
 				bettingRound++;
