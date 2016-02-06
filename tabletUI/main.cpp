@@ -246,7 +246,10 @@ void proccessIncData(string strIn)
 
 
 	}
-	else cout << "Error data.size() = " << data.size() << endl;
+	else
+	{
+		throw runtime_error("Incorrect data.size()");
+	}
 
 	if(state==3&&isBetting)
 	{
@@ -375,7 +378,14 @@ int main(int argc, char* args[])
 		if(getData(data))
 		{
 			cout << "From Main Loop: " << data << endl;
+			try{
 			proccessIncData(data);
+			}
+			catch(exception &e)
+			{
+				cout << e.what() << endl;
+				sendServer("resend");
+			}
 		}
 
 			SDL_RenderClear(gRenderer);

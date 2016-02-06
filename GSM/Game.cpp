@@ -465,6 +465,13 @@ void Game::start()
 					cout << "Player " << ident << " bought in!!!\n";
 					player[ident].buyInNextRound = true;
 				}
+				//Resend
+				if(strcmp(command,"resend")==0)
+				{
+					updatePlayer(ident);
+					SDL_Delay(50);
+				}
+				
 			}
 
 			if(tempPot!=readWeightSensor())
@@ -734,6 +741,13 @@ void Game::start()
 						cout << "Player " << ident << " bought in!!!\n";
 						player[ident].buyInNextRound = true;
 					}
+					//Resend
+					if(strcmp(command,"resend")==0)
+					{
+						cout << "Resending update to Player " << ident << endl;
+						updatePlayer(ident);
+						SDL_Delay(50);
+					}
 
 				}
 
@@ -794,6 +808,12 @@ void Game::start()
 				{
 					cout << "Player " << ident << " bought in!!!\n";
 					player[ident].buyIn(20);
+				}
+				//Resend
+				if(strcmp(command,"resend")==0)
+				{
+					updatePlayer(ident);
+					SDL_Delay(50);
 				}
 			}
 
@@ -860,6 +880,12 @@ void Game::start()
 					cout << "Player " << ident << " bought in!!!\n";
 					player[ident].buyIn(20);
 				}
+				//Resend
+				if(strcmp(command,"resend")==0)
+				{
+					updatePlayer(ident);
+					SDL_Delay(50);
+				}
 			}
 
 			cout << "Now in Hand Resolution State\n";
@@ -886,6 +912,12 @@ void Game::start()
 				{
 					cout << "Player " << ident << " bought in!!!\n";
 					player[ident].buyIn(20);
+				}
+				//Resend
+				if(strcmp(command,"resend")==0)
+				{
+					updatePlayer(ident);
+					SDL_Delay(50);
 				}
 			}
 
