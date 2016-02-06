@@ -108,12 +108,29 @@ void Pot::distributePot()
 			}
 		}
 
+		double ammountAwarded = 0;
+		double unevenSplitBonus = 0;
 		cout << "Splitting pot amongst winners\n";
-		double ammountAwarded = ammount/winnerCount;
+		if(fmod(ammount/winnerCount,0.25)!=0)
+		{
+			unevenSplitBonus = fmod(ammount/winnerCount,0.25)*winnerCount;
+			cout << "Uneven Split: " << unevenSplitBonus << endl;
+			ammountAwarded = (ammount-unevenSplitBonus)/winnerCount;
+			
+		}
+		else ammountAwarded = ammount/winnerCount;
+
 		for(int i=0;i<winners.size();i++)
 		{
 			winners.at(i)->chipTotal += ammountAwarded;
 			cout << "Player " << winners.at(i)->getPlayerNumber() << " awarded $" << ammountAwarded << endl;
+		}
+
+		if(unevenSplitBonus>0)
+		{
+			int randPlayer = rand()%winners.size();
+			winners.at(randPlayer)->chipTotal += unevenSplitBonus;
+			cout << "Player " << winners.at(randPlayer)->getPlayerNumber() << " gets uneven split bonus of $" << unevenSplitBonus << endl;
 		}
 	}
 }
