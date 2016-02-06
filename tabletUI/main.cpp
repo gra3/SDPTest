@@ -317,20 +317,14 @@ int main(int argc, char* args[])
 	bool quit = false;
 	while (!quit){
 
-		//char *data;
-		//if(getData(data))
-		//{
-		//	cout << data << endl;
-		//	processIncData(msg);
-		//}
-
-		//string data;
-		//if(getData(data))
-		//{
-		//	cout << "From Main Loop: " << data << endl;
-		//	//proccessIncData(data);
-		//}
+		
 		if(state>0&&!isActive&&!buyInButton.isEnabled()&&!waitingForNextRound) buyInButton.enable();
+		if(state==6&&playerTotal==0&&!waitingForNextRound)
+		{
+			isActive = false;
+			disableAllCards();
+			buyInButton.enable();
+		}
 		while( SDL_PollEvent( &e ) != 0 )
 			{
 

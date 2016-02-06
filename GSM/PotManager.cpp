@@ -112,6 +112,8 @@ void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
 		}
 	}
 
+	if(pot[pot.size()-1].ableToWin.size()==0) pot.pop_back();
+
 	//Determine if anything needs to be transfered to the new sidepot
 	double rmFromPrevPot = 0;
 	if(*minCall>ammountIn)

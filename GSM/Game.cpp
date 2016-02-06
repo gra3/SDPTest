@@ -649,11 +649,14 @@ void Game::start()
 							}
 
 							updatePlayer(bettingPlayerNumber);
-							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
+							if(numberAbleToBet()>0) bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1)
+							{
+								player[bettingPlayerNumber].setBetting(true);
+								player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
+								updatePlayer(bettingPlayerNumber);
+							}
 							potLastBet = potTotal;
-							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
-							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 						}
 						
@@ -669,11 +672,14 @@ void Game::start()
 							player[bettingPlayerNumber].setBetting(false);
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
-							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
+							if(numberAbleToBet()>0) bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) 
+							{
+								player[bettingPlayerNumber].setBetting(true);
+								player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
+								updatePlayer(bettingPlayerNumber);
+							}
 							potLastBet = potTotal;
-							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
-							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 						}
 						//Player Raised
@@ -689,11 +695,14 @@ void Game::start()
 							player[bettingPlayerNumber].setBetting(false);
 							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
-							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
-							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1) player[bettingPlayerNumber].setBetting(true);
+							if(numberAbleToBet()>0) bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
+							if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>1&&numberStillInRound()!=1)
+							{
+								player[bettingPlayerNumber].setBetting(true);
+								player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
+								updatePlayer(bettingPlayerNumber);
+							}
 							potLastBet = potTotal;
-							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
-							updatePlayer(bettingPlayerNumber);
 							SDL_Delay(50);
 						}
 					}
@@ -706,16 +715,14 @@ void Game::start()
 						player[bettingPlayerNumber].setBetting(false);
 						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
-						//bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
+						if(numberAbleToBet()>0) bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
 						if(callCount != numberStillInRound()-numberAllIn()&&numberAbleToBet()>0&&numberStillInRound()!=1) 
 						{
-							cout << "HOW?E?E?E?E\n";
-							bettingPlayerNumber = player[bettingPlayerNumber].findNextActiveAndInRound()->getPlayerNumber();
 							player[bettingPlayerNumber].setBetting(true);
+							player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
+							updatePlayer(bettingPlayerNumber);
 						}
 						potLastBet = potTotal;
-						player[bettingPlayerNumber].lastCurrentBet = player[bettingPlayerNumber].currentBet;
-						updatePlayer(bettingPlayerNumber);
 						SDL_Delay(50);
 					}
 
@@ -864,10 +871,9 @@ void Game::start()
 			pots->determineWinners();
 			pots->distributePots();
 
+			state = CLEANUP;
 			for(int i=0;i<player.size();i++) if(player[i].isActive()) updatePlayer(i);
 			SDL_Delay(50);
-
-			state = CLEANUP;
 			break;
 			}
 			//*********************************************CLEAN UP*****************************************************
