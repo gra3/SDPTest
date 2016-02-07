@@ -905,6 +905,7 @@ void Game::start()
 			state = CLEANUP;
 			for(int i=0;i<player.size();i++) if(player[i].isActive()) updatePlayer(i);
 			SDL_Delay(50);
+			for(int i=0;i<player.size();i++) if(player[i].isActive()&&player[i].chipTotal==0) player[i].setInactive();
 			break;
 			}
 			//*********************************************CLEAN UP*****************************************************
@@ -926,7 +927,7 @@ void Game::start()
 				}
 			}
 
-			if(readWeightSensor()==0)
+			if(readWeightSensor()==0&&numActive()>=2)
 			{
 				resetNewHand();
 				state=BLINDS;
