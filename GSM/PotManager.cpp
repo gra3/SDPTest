@@ -96,10 +96,12 @@ void PotManager::raise(double ammount, int bettingRound, int playerNum)
 	}
 }
 
-void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
+void PotManager::allIn(int playerNum, double ammountIn, int numCalled, double lastBet)
 {
 	//Make new sidepot
 	makeSidePot();
+
+	if(pot[pot.size()-2].ammount==0) pot.pop_back();
 
 	//Add All players to the new sidepot that aren't the one that just went all in
 	for(int i= 0;i<allPlayers->size();i++)
@@ -113,6 +115,7 @@ void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
 	}
 
 	if(pot[pot.size()-1].ableToWin.size()==0) pot.pop_back();
+	
 
 	//Determine if anything needs to be transfered to the new sidepot
 	double rmFromPrevPot = 0;
@@ -124,15 +127,15 @@ void PotManager::allIn(int playerNum, double ammountIn, int numCalled)
 		cout << "numcalled: " << numCalled << endl;
 		pot[pot.size()-2].rmFromPot(rmFromPrevPot*numCalled);
 		pot[pot.size()-1].addToPot(rmFromPrevPot*numCalled);
-		pot[pot.size()-2].addToPot(ammountIn);
+		pot[pot.size()-2].addToPot(ammountIn-lastBet);
 	}
 	else if(*minCall<ammountIn)
 	{
-		pot[pot.size()-2].addToPot(ammountIn);
+		pot[pot.size()-2].addToPot(ammountIn-lastBet);
 	}
 	else if(*minCall==ammountIn)
 	{
-		pot[pot.size()-2].addToPot(ammountIn);
+		pot[pot.size()-2].addToPot(ammountIn-lastBet);
 	}
 
 }

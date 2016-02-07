@@ -17,7 +17,7 @@ public:
 	void printPots();
 	void add(double ammountIn);
 	void fold(int playerNum);
-	void allIn(int playerNum, double ammountIn, int numCalled);
+	void allIn(int playerNum, double ammountIn, int numCalled, double lastBet);
 	void reset();
 	void call(double ammount);
 	void raise(double ammount, int bettingRound, int playerNum);
