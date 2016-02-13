@@ -473,3 +473,184 @@ vector<Card> CardDetect::getCards(int numCards, Deck &deck)
 	}
 	return cards;
 }
+
+vector<Card> CardDetect::getCardsNonBlock(int numCards, Deck &deck)
+{
+	int cardsDetected = 0;
+	vector<Card> cards;
+
+	//Read Image
+	cap->read(src);
+
+	//Convert to Grayscale
+	cvtColor(src,gray,CV_BGR2GRAY);
+
+	//Blur
+	//blur(gray,gray,Size(3,3));
+	GaussianBlur(gray,gray,Size(3,3),1000,1000,BORDER_DEFAULT);
+
+	//Canny Edge Detection
+	Canny(gray,canny,30,90,3);
+
+	//Hough Line Detection
+	vector<Vec4i> lines;
+	cvtColor(canny,hough,COLOR_GRAY2BGR);
+	HoughLinesP(canny,lines,1,CV_PI/180,100,80,5);
+
+	//Filter Out Simular Lines
+	vector<Vec4i> unique_lines;
+	if(lines.size()>0) unique_lines.push_back(lines[0]);
+	for(int i=1;i<lines.size();i++)
+	{
+		bool unique = true;
+		for(int j =0;j<unique_lines.size();j++)
+		{
+			if(areSlopesSimular(lines[i],unique_lines[j])&&computeDistance(lines[i],unique_lines[j])<10) unique = false;
+		}
+		if(unique) unique_lines.push_back(lines[i]);
+	}
+
+	//Pair Lines with simular angle and set distance
+	vector<vector<Vec4i>> line_pairs;
+	int pairNumber =0;
+	for(int i=0;i<unique_lines.size();i++)
+	{
+		for(int j=i+1;j<unique_lines.size();j++)
+		{
+			//if(areSlopesSimular(unique_lines[i],unique_lines[j])) cout << "Distance: " << computeDistance(unique_lines[i],unique_lines[j]) << endl;
+			vector<Vec4i> temp;
+			if(areSlopesSimular(unique_lines[i],unique_lines[j])
+				&&computeDistance(unique_lines[i],unique_lines[j])>300
+				&&computeDistance(unique_lines[i],unique_lines[j])<600)
+			{
+				temp.push_back(unique_lines[i]);
+				temp.push_back(unique_lines[j]);
+				line_pairs.push_back(temp);
+			}
+		}
+	}
+
+	//Make Rects from pairs
+	vector<vector<Point2f>> corners;
+	for(int i=0;i<line_pairs.size();i++)
+	{
+		for(int j=i+1;j<line_pairs.size();j++)
+		{
+			Point2f pt1,pt2,pt3,pt4;
+			vector<Point2f> temp;
+
+			//Get intersections (corners)
+			pt1 = computeIntersect(line_pairs[i][0],line_pairs[j][0]);
+			pt2 = computeIntersect(line_pairs[i][0],line_pairs[j][1]);
+			pt3 = computeIntersect(line_pairs[i][1],line_pairs[j][0]);
+			pt4 = computeIntersect(line_pairs[i][1],line_pairs[j][1]);
+			temp.push_back(pt1);
+			temp.push_back(pt2);
+			temp.push_back(pt3);
+			temp.push_back(pt4);
+
+			// Get mass center
+			if(temp.size()>=4)
+			{
+			Point2f center(0,0);
+			for (int i = 0; i < temp.size(); i++) center += temp[i];
+			center *= (1. / temp.size());
+			sortCorners(temp, center);
+			}
+
+			//Make lines for areLengthsSimular()
+			Vec4i l1(pt1.x,pt1.y,pt2.x,pt2.y);
+			Vec4i l2(pt3.x,pt3.y,pt4.x,pt4.y);
+			Vec4i l3(pt1.x,pt1.y,pt3.x,pt3.y);
+			Vec4i l4(pt2.x,pt2.y,pt4.x,pt4.y);
+
+			if(isContourConvex(temp)&&
+				contourArea(temp)>155000&&
+				contourArea(temp)<170000&&
+				areLengthsSimular(l1,l2)&&
+				areLengthsSimular(l3,l4))
+			{
+				//cout << "Temp Area: " << contourArea(temp) << endl;
+				corners.push_back(temp);
+			}
+		}
+	}
+
+	//Matching
+	for(int i = 0;i<corners.size();i++)
+	{
+		Card detected;
+		bool unique = true;
+			
+		if(match(corners[i],detected))
+		{
+			if(deck.isNotActive(detected))
+			{
+				deck.addActive(detected);
+				cards.push_back(detected);
+				cardsDetected++;
+			}
+		}
+	}
+
+
+	//cout << "Cards Detected: " << cardsDetected << endl;
+
+	//Display Info
+	//cout << "Lines: " << lines.size() << endl;
+	//cout << "Unique lines: " << unique_lines.size() << endl;
+	//cout << "Line Pairs: " << line_pairs.size() << endl;
+	//cout << "Sets of Corners: " << corners.size() << endl;
+
+	//Draw Lines
+	/*for( size_t i = 0; i < lines.size(); i++ )
+	{
+		Vec4i l = lines[i];
+		line(hough, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,0), 3, CV_AA);
+	}*/
+
+	//Draw Unique Lines
+	for( size_t i = 0; i < unique_lines.size(); i++ )
+	{
+		Vec4i l = unique_lines[i];
+		line(hough, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(255,0,0), 3, CV_AA);
+	}
+
+	//Draw Line Pairs
+	for( size_t i = 0; i < line_pairs.size(); i++ )
+	{
+		Vec4i l1 = line_pairs[i][0];
+		Vec4i l2 = line_pairs[i][1];
+		Point2f midA = findMidpoint(l1);
+		Point2f midB = findMidpoint(l2);
+		line(hough, Point(l1[0], l1[1]), Point(l1[2], l1[3]), Scalar(255,0,255), 3, CV_AA);
+		line(hough, Point(l2[0], l2[1]), Point(l2[2], l2[3]), Scalar(255,0,255), 3, CV_AA);
+		line(hough, midA, midB, Scalar(0,255,0),3,CV_AA);
+	}
+
+	//Draw Rects
+	for(int i=0;i<corners.size();i++)
+	{
+		line(hough, corners[i][0], corners[i][1], Scalar(0,0,255), 3, CV_AA);
+		line(hough, corners[i][1], corners[i][2], Scalar(0,0,255), 3, CV_AA);
+		line(hough, corners[i][2], corners[i][3], Scalar(0,0,255), 3, CV_AA);
+		line(hough, corners[i][3], corners[i][0], Scalar(0,0,255), 3, CV_AA);
+	}
+
+	//Display Windows
+	imshow("Source",src);
+	imshow("Canny",canny);
+	imshow("Hough",hough);
+
+	if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
+	{
+		cout << "esc key is pressed by user" << endl;
+	}
+
+	while(cards.size()>numCards)
+	{
+		cards.pop_back();
+	}
+	
+	return cards;
+}

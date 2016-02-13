@@ -45,6 +45,8 @@ public:
 	bool match(vector<Point2f> inRect,Card &outCard);
 
 	vector<Card> getCards(int numCards, Deck &deck);
+
+	vector<Card> getCardsNonBlock(int numCards, Deck &deck);
 	
 };
 

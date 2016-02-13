@@ -59,5 +59,7 @@ public:
 	int numberWithHighestRank(int highestRank);
 	void calcPots();
 	vector<Player> sortPokerHands();
+	void dealingDebug();
+	void commCardDebug();
 };
 

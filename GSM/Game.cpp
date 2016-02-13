@@ -118,6 +118,87 @@ void Game::getHands()
 	}
 }
 
+void Game::dealingDebug()
+{
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isActive())
+		{
+			player[i].hand[0].set(rRank(),rSuit());
+			player[i].hand[1].set(rRank(),rSuit());
+			player[i].fullHand.addCard(player[i].hand[0]);
+			player[i].fullHand.addCard(player[i].hand[1]);
+		}
+	}
+}
+
+void Game::commCardDebug()
+{
+	if(bettingRound==2)
+			{
+				commCard[0].set(10,0);
+				commCard[1].set(10,1);
+				commCard[2].set(6,2);
+
+				for(int i=0;i<numberOfPlayers;i++)
+				{
+					if(player[i].isActive())
+					{
+						player[i].fullHand.addCard(commCard[0]);
+						player[i].fullHand.addCard(commCard[1]);
+						player[i].fullHand.addCard(commCard[2]);
+					}
+				}
+
+				if(bettingBypass) bettingRound++;
+			}
+
+			if(bettingRound==3)
+			{
+				commCard[3].set(6,3);
+
+				for(int i=0;i<numberOfPlayers;i++)
+				{
+					if(player[i].isActive())
+					{
+						player[i].fullHand.addCard(commCard[3]);
+					
+					}
+				}
+
+				if(bettingBypass) bettingRound++;
+			}
+
+			if(bettingRound==4)
+			{
+				commCard[4].set(6,0);
+				
+				for(int i=0;i<numberOfPlayers;i++)
+				{
+					if(player[i].isActive())
+					{
+						player[i].fullHand.addCard(commCard[4]);
+					
+					}
+				}
+
+				if(bettingBypass) state = HANDRES;
+			}
+
+			if(!bettingBypass)
+			{
+				state = BETTING;
+				for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
+				bettingPlayer = NULL;
+				SDL_Delay(50);
+			}
+			if(bettingBypass)
+			{
+				for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
+				state = HANDRES;
+			}
+}
+
 ///<summary>Returns true if all players have connected</summary>
 ///<returns>Returns bool true if all players are connected, else false</returns>
 bool Game::allPlayersConnected()
@@ -524,20 +605,8 @@ void Game::start()
 			case DEALING:
 
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
-			player[0].hand[0].set(12,0);
-			player[0].hand[1].set(7,1);
-			player[0].fullHand.addCard(player[0].hand[0]);
-			player[0].fullHand.addCard(player[0].hand[1]);
-
-			player[1].hand[0].set(12,3);
-			player[1].hand[1].set(12,1);
-			player[1].fullHand.addCard(player[1].hand[0]);
-			player[1].fullHand.addCard(player[1].hand[1]);
-
-			player[2].hand[0].set(3,2);
-			player[2].hand[1].set(12,3);
-			player[2].fullHand.addCard(player[2].hand[0]);
-			player[2].fullHand.addCard(player[2].hand[1]);
+			
+			dealingDebug();
 
 			state = BETTING;
 			for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
@@ -823,53 +892,9 @@ void Game::start()
 			}
 
 			cout << "Now in Community Card State\n";
-			if(bettingRound==2)
-			{
-				commCard[0].set(10,0);
-				commCard[1].set(10,1);
-				commCard[2].set(6,2);
-				player[0].fullHand.addCard(commCard[0]);
-				player[0].fullHand.addCard(commCard[1]);
-				player[0].fullHand.addCard(commCard[2]);
-				player[1].fullHand.addCard(commCard[0]);
-				player[1].fullHand.addCard(commCard[1]);
-				player[1].fullHand.addCard(commCard[2]);
-				player[2].fullHand.addCard(commCard[0]);
-				player[2].fullHand.addCard(commCard[1]);
-				player[2].fullHand.addCard(commCard[2]);
-				if(bettingBypass) bettingRound++;
-			}
 
-			if(bettingRound==3)
-			{
-				commCard[3].set(6,3);
-				player[0].fullHand.addCard(commCard[3]);
-				player[1].fullHand.addCard(commCard[3]);
-				player[2].fullHand.addCard(commCard[3]);
-				if(bettingBypass) bettingRound++;
-			}
+			commCardDebug();
 
-			if(bettingRound==4)
-			{
-				commCard[4].set(6,0);
-				player[0].fullHand.addCard(commCard[4]);
-				player[1].fullHand.addCard(commCard[4]);
-				player[2].fullHand.addCard(commCard[4]);
-				if(bettingBypass) state = HANDRES;
-			}
-
-			if(!bettingBypass)
-			{
-				state = BETTING;
-				for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
-				bettingPlayer = NULL;
-				SDL_Delay(50);
-			}
-			if(bettingBypass)
-			{
-				for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
-				state = HANDRES;
-			}
 			SDL_Delay(100);
 			break;
 
