@@ -53,6 +53,10 @@ public:
 
 	void getHand();
 
+	bool bothHandCardsDealt();
+
+	int numberOfHandCards();
+
 	bool operator<(const Player &other);
 };
 

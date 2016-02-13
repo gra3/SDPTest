@@ -33,6 +33,7 @@ public:
 	int callCount;
 	bool bettingBypass;
 	PotManager* pots;
+	bool debug;
 
 	Game(int numPlayers, double sB, double bB, double buy);
 	~Game(void);
@@ -61,5 +62,9 @@ public:
 	vector<Player> sortPokerHands();
 	void dealingDebug();
 	void commCardDebug();
+	bool allHandCardsDealt();
+	int numberCommCardDealt();
+	int dealerPlayerNumber();
+	void updateAllActive();
 };
 

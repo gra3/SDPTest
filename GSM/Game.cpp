@@ -30,6 +30,9 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 	srand (time(NULL));
 
 
+	//Debug
+	debug = false;
+
 
 	for(int i=0;i<numPlayers;i++) player.push_back(Player());
 	initSDL();
@@ -83,6 +86,21 @@ void Game::initializeCameras()
 	cout << "All Cameras Initialized.\n";
 }
 
+int Game::numberCommCardDealt()
+{
+	int c=0;
+	for(int i=0;i<5;i++) if(commCard[i].rank!=0) c++;
+	return c;
+}
+
+int Game::dealerPlayerNumber()
+{
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isActive()&&player[i].isDealer()) return player[i].getPlayerNumber();
+	}
+}
+
 
 ///<summary>Initializes all cameras to the default camera</summary>
 ///<returns>Zero</returns>
@@ -116,6 +134,15 @@ void Game::getHands()
 	{
 		
 	}
+}
+
+bool Game::allHandCardsDealt()
+{
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isActive()&&!player[i].bothHandCardsDealt()) return false;
+	}
+	return true;
 }
 
 void Game::dealingDebug()
@@ -197,6 +224,7 @@ void Game::commCardDebug()
 				for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
 				state = HANDRES;
 			}
+			SDL_Delay(100);
 }
 
 ///<summary>Returns true if all players have connected</summary>
@@ -288,6 +316,15 @@ void Game::updatePlayer(int playerNum)
 	//cout << outMsg << endl;
 
 	if(sendClient(playerNum,outMsg)) cout << "Updated Player " << playerNum << endl;
+}
+
+void Game::updateAllActive()
+{
+	for(int i=0;i<numberOfPlayers;i++)
+	{
+		if(player[i].isActive()) updatePlayer(i);
+	}
+	SDL_Delay(50);
 }
 
 ///<summary>Calculates the total number of chips in the Pot</summary>
@@ -606,7 +643,43 @@ void Game::start()
 
 			cout <<  "Blinds Satisfied. Now in Dealing state\n";
 			
-			dealingDebug();
+			if(debug) dealingDebug();
+			else
+			{
+				while(!allHandCardsDealt())
+				{
+					for(int i=0;i<numberOfPlayers;i++)
+					{
+						if(player[i].isActive()&&!player[i].bothHandCardsDealt())
+						{
+							vector<Card> temp = player[i].cam->getCardsNonBlock(2-player[i].numberOfHandCards(),deck);
+							if(temp.size()==2&&player[i].numberOfHandCards()==0)
+							{
+								player[i].hand[1] = temp[1];
+								player[i].hand[0] = temp[0];
+								updatePlayer(i);
+								SDL_Delay(50);
+							}
+							else if(temp.size()==1)
+							{
+								if(player[i].numberOfHandCards()==0) player[i].hand[0] = temp[0];
+								else player[i].hand[1] = temp[0];
+								updatePlayer(i);
+								SDL_Delay(50);
+							}
+						}
+					}
+				}
+				
+				for(int i=0;i<numberOfPlayers;i++)
+				{
+					if(player[i].isActive())
+					{
+						player[i].fullHand.addCard(player[i].hand[0]);
+						player[i].fullHand.addCard(player[i].hand[1]);
+					}
+				}
+			}
 
 			state = BETTING;
 			for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
@@ -893,7 +966,119 @@ void Game::start()
 
 			cout << "Now in Community Card State\n";
 
-			commCardDebug();
+			if(debug) commCardDebug();
+			else
+			{
+				if(bettingRound==2)
+				{
+					while(numberCommCardDealt()!=3)
+					{
+						vector<Card> temp = player[dealerPlayerNumber()].cam->getCardsNonBlock(3-numberCommCardDealt(),deck);
+						if(temp.size()==3)
+						{
+							commCard[0] = temp[0];
+							commCard[1] = temp[1];
+							commCard[2] = temp[2];
+							updateAllActive();
+						}
+						else if(temp.size()==2)
+						{
+							if(numberCommCardDealt()==0)
+							{
+								commCard[0] = temp[0];
+								commCard[1] = temp[1];
+							
+							}
+							else if(numberCommCardDealt()==1)
+							{
+								commCard[1] = temp[0];
+								commCard[2] = temp[1];
+							}
+							updateAllActive();
+						}
+						else if(temp.size()==1)
+						{
+							if(numberCommCardDealt()==0) commCard[0] = temp[0];
+							else if(numberCommCardDealt()==1) commCard[1] = temp[0];
+							else if(numberCommCardDealt()==2) commCard[2] = temp[0];
+							updateAllActive();
+						}
+					}
+
+					for(int i=0;i<numberOfPlayers;i++)
+					{
+						if(player[i].isActive())
+						{
+							player[i].fullHand.addCard(commCard[0]);
+							player[i].fullHand.addCard(commCard[1]);
+							player[i].fullHand.addCard(commCard[2]);
+						}
+					}
+
+					if(bettingBypass) bettingRound++;
+				}
+
+				if(bettingRound==3)
+				{
+					while(numberCommCardDealt()!=4)
+					{
+						vector<Card> temp = player[dealerPlayerNumber()].cam->getCardsNonBlock(1,deck);
+						if(temp.size()==1)
+						{
+							commCard[3] = temp[0];
+							updateAllActive();
+						}
+					}
+
+					for(int i=0;i<numberOfPlayers;i++)
+					{
+						if(player[i].isActive())
+						{
+							player[i].fullHand.addCard(commCard[3]);
+					
+						}
+					}
+
+					if(bettingBypass) bettingRound++;
+				}
+
+				if(bettingRound==4)
+				{
+					while(numberCommCardDealt()!=5)
+					{
+						vector<Card> temp = player[dealerPlayerNumber()].cam->getCardsNonBlock(1,deck);
+						if(temp.size()==1)
+						{
+							commCard[4] = temp[0];
+							updateAllActive();
+						}
+					}
+				
+					for(int i=0;i<numberOfPlayers;i++)
+					{
+						if(player[i].isActive())
+						{
+							player[i].fullHand.addCard(commCard[4]);
+					
+						}
+					}
+
+					if(bettingBypass) state = HANDRES;
+				}
+
+				if(!bettingBypass)
+				{
+					state = BETTING;
+					for(int i=0;i<numberOfPlayers;i++) if(player[i].isActive()) updatePlayer(i);
+					bettingPlayer = NULL;
+					SDL_Delay(50);
+				}
+				if(bettingBypass)
+				{
+					for(int i=0;i<numberOfPlayers;i++) updatePlayer(i);
+					state = HANDRES;
+				}
+			}
 
 			SDL_Delay(100);
 			break;

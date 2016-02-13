@@ -109,6 +109,19 @@ void Player::setBetting(bool val)
 	isBet = val;
 }
 
+bool Player::bothHandCardsDealt()
+{
+	if(hand[0].rank!=0&&hand[1].rank!=0) return true;
+	else return false;
+}
+
+int Player::numberOfHandCards()
+{
+	int c = 0;
+	if(hand[0].rank!=0) c++;
+	if(hand[1].rank!=0) c++;
+	return c;
+}
 
 Player* Player::findNextActive()
 {
