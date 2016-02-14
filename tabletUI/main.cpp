@@ -414,7 +414,7 @@ int main(int argc, char* args[])
 			}
 
 			//Draw Winnings
-			if(state==6&&totalWon>0) drawText(screenWidth/2,screenHeight/2,"You Won: $" + totalWonString);
+			if(state==6&&totalWon>0) drawText(screenWidth/2-100,screenHeight/2-25,"You Won: $" + totalWonString);
 
 			//Draw Buttons
 			connectButton.draw();

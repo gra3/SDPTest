@@ -163,9 +163,9 @@ void Game::commCardDebug()
 {
 	if(bettingRound==2)
 			{
-				commCard[0].set(10,0);
-				commCard[1].set(10,1);
-				commCard[2].set(6,2);
+				commCard[0].set(rRank(),rSuit());
+				commCard[1].set(rRank(),rSuit());
+				commCard[2].set(rRank(),rSuit());
 
 				for(int i=0;i<numberOfPlayers;i++)
 				{
@@ -182,7 +182,7 @@ void Game::commCardDebug()
 
 			if(bettingRound==3)
 			{
-				commCard[3].set(6,3);
+				commCard[3].set(rRank(),rSuit());
 
 				for(int i=0;i<numberOfPlayers;i++)
 				{
@@ -198,7 +198,7 @@ void Game::commCardDebug()
 
 			if(bettingRound==4)
 			{
-				commCard[4].set(6,0);
+				commCard[4].set(rRank(),rSuit());
 				
 				for(int i=0;i<numberOfPlayers;i++)
 				{
