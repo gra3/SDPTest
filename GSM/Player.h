@@ -23,6 +23,7 @@ public:
 	bool possibleWinner;
 	bool buyInNextRound;
 	PokerHand fullHand;
+	double totalWon;
 
 	Player* nextPlayer;
 
@@ -50,6 +51,10 @@ public:
 
 	bool isBetting();
 	void setBetting(bool val);
+
+	void addWinnings(double potAmmount);
+
+	double getWinnings();
 
 	void getHand();
 

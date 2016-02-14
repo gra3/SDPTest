@@ -120,7 +120,7 @@ bool getData(string &outString)
 		if(SDLNet_SocketReady(clientSoc))
 		{
 			int result;
-			result = SDLNet_TCP_Recv(clientSoc,msg,100);
+			result = SDLNet_TCP_Recv(clientSoc,msg,200);
 			if(result>1)
 			{
 				string temp = msg;

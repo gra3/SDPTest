@@ -20,6 +20,7 @@ Player::Player()
 	possibleWinner = false;
 	totalPutIntoPot = 0;
 	buyInNextRound = false;
+	totalWon = 0;
 }
 
 
@@ -121,6 +122,16 @@ int Player::numberOfHandCards()
 	if(hand[0].rank!=0) c++;
 	if(hand[1].rank!=0) c++;
 	return c;
+}
+
+void Player::addWinnings(double potAmmount)
+{
+	totalWon += potAmmount;
+}
+
+double Player::getWinnings()
+{
+	return totalWon;
 }
 
 Player* Player::findNextActive()

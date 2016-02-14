@@ -52,6 +52,8 @@ double currentBet;
 string currentBetString;
 double minToRaise;
 string minToRaiseString;
+double totalWon;
+string totalWonString;
 
 bool waitingForNextRound;
 bool isActive;
@@ -190,7 +192,7 @@ void proccessIncData(string strIn)
 	}
 	
 
-	if(data.size()==25)
+	if(data.size()==26)
 	{
 		handCard[0].set(data[1],data[0]);
 		handCard[1].set(data[3],data[2]);
@@ -244,7 +246,11 @@ void proccessIncData(string strIn)
 		}
 		else if(!isActive) disableAllCards();
 
-
+		//Player Winnings
+		totalWon = data[25];
+		stream.str(string());
+		stream << fixed << setprecision(2) << data[25];
+		totalWonString = stream.str();
 	}
 	else
 	{
@@ -406,6 +412,9 @@ int main(int argc, char* args[])
 				drawText(425,165,"Min to Call: $" + minToCallString);
 				drawText(425,200,"Min to Raise: $" + minToRaiseString);
 			}
+
+			//Draw Winnings
+			if(state==6&&totalWon>0) drawText(screenWidth/2,screenHeight/2,"You Won: $" + totalWonString);
 
 			//Draw Buttons
 			connectButton.draw();

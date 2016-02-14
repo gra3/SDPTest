@@ -78,6 +78,7 @@ void Pot::distributePot()
 	if(ableToWin.size()==1) 
 	{
 		ableToWin.at(0)->chipTotal += ammount;
+		ableToWin.at(0)->addWinnings(ammount);
 		cout << "Player " << ableToWin.at(0)->getPlayerNumber() << " awarded $" << ammount << endl;
 	}
 	else
@@ -123,6 +124,7 @@ void Pot::distributePot()
 		for(int i=0;i<winners.size();i++)
 		{
 			winners.at(i)->chipTotal += ammountAwarded;
+			winners.at(i)->addWinnings(ammountAwarded);
 			cout << "Player " << winners.at(i)->getPlayerNumber() << " awarded $" << ammountAwarded << endl;
 		}
 
@@ -130,6 +132,7 @@ void Pot::distributePot()
 		{
 			int randPlayer = rand()%winners.size();
 			winners.at(randPlayer)->chipTotal += unevenSplitBonus;
+			winners.at(randPlayer)->addWinnings(unevenSplitBonus);
 			cout << "Player " << winners.at(randPlayer)->getPlayerNumber() << " gets uneven split bonus of $" << unevenSplitBonus << endl;
 		}
 	}

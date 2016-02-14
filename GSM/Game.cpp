@@ -31,7 +31,7 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 
 
 	//Debug
-	debug = false;
+	debug = true;
 
 
 	for(int i=0;i<numPlayers;i++) player.push_back(Player());
@@ -309,7 +309,10 @@ void Game::updatePlayer(int playerNum)
 	buildMsg += to_string((minToCall*2)-player[playerNum].lastCurrentBet) + " ";
 
 	//isActive
-	buildMsg += to_string(player[playerNum].isActive()) + " \n";
+	buildMsg += to_string(player[playerNum].isActive()) + " ";
+
+	//Player Winnings
+	buildMsg += to_string(player[playerNum].getWinnings()) + " \n";
 
 	
 	char* outMsg = &buildMsg[0u];
@@ -452,6 +455,7 @@ void Game::resetNewHand()
 		player[i].fullHand.resetPokerHand();
 		player[i].possibleWinner = false;
 		player[i].buyInNextRound =false;
+		player[i].totalWon = 0;
 	}
 	for(int i=0;i<5;i++) commCard[i].set(0,0);
 	bettingPlayer = NULL;
