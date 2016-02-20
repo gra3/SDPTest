@@ -654,3 +654,9 @@ vector<Card> CardDetect::getCardsNonBlock(int numCards, Deck &deck)
 	
 	return cards;
 }
+
+void CardDetect::clearBuffer()
+{
+	Mat trash;
+	cap->read(trash);
+}

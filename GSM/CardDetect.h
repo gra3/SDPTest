@@ -47,6 +47,8 @@ public:
 	vector<Card> getCards(int numCards, Deck &deck);
 
 	vector<Card> getCardsNonBlock(int numCards, Deck &deck);
+
+	void clearBuffer();
 	
 };
 

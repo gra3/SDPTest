@@ -31,7 +31,7 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 
 
 	//Debug
-	debug = true;
+	debug = false;
 
 
 	for(int i=0;i<numPlayers;i++) player.push_back(Player());
@@ -456,7 +456,10 @@ void Game::resetNewHand()
 		player[i].possibleWinner = false;
 		player[i].buyInNextRound =false;
 		player[i].totalWon = 0;
+		player[i].cam->clearBuffer();
 	}
+	
+
 	for(int i=0;i<5;i++) commCard[i].set(0,0);
 	bettingPlayer = NULL;
 	bettingRound = 1;
