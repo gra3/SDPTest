@@ -45,6 +45,7 @@ public:
 	 int flushOdds();
 	 int straightOdds();
 	 int straightFlushOdds();
+	 void addCard(Card cardIn);
 
 	 double oddsCall();
 	 double outsToOdds(double outs);

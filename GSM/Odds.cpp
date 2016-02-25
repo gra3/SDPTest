@@ -16,13 +16,13 @@
 
 Odds::Odds()
 {
-	hand.resize(6);
-	hand[0].set(7,3);
-	hand[1].set(6,0);
-	hand[2].set(13,3);
-	hand[3].set(6,2);
-	hand[4].set(7,0);
-	hand[5].set(14,2);
+	//hand.resize(6);
+	//hand[0].set(7,3);
+	//hand[1].set(6,0);
+	//hand[2].set(13,3);
+	//hand[3].set(6,2);
+	//hand[4].set(7,0);
+	//hand[5].set(14,2);
 
 }
 
@@ -1011,4 +1011,9 @@ double Odds::oddsCall()
 	cout << "The best hands odds are: " << oddsOut.bestHandOdds << "%" << endl;
 	//return(oddsReturn);
 	return(0);
+}
+
+void Odds::addCard(Card cardIn)
+{
+	hand.push_back(cardIn);
 }

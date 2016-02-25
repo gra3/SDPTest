@@ -31,7 +31,7 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 
 
 	//Debug
-	debug = false;
+	debug = true;
 
 
 	for(int i=0;i<numPlayers;i++) player.push_back(Player());
@@ -155,6 +155,8 @@ void Game::dealingDebug()
 			player[i].hand[1].set(rRank(),rSuit());
 			player[i].fullHand.addCard(player[i].hand[0]);
 			player[i].fullHand.addCard(player[i].hand[1]);
+			player[i].odds.addCard(player[i].hand[0]);
+			player[i].odds.addCard(player[i].hand[1]);
 		}
 	}
 }
@@ -174,6 +176,10 @@ void Game::commCardDebug()
 						player[i].fullHand.addCard(commCard[0]);
 						player[i].fullHand.addCard(commCard[1]);
 						player[i].fullHand.addCard(commCard[2]);
+						player[i].odds.addCard(commCard[0]);
+						player[i].odds.addCard(commCard[1]);
+						player[i].odds.addCard(commCard[2]);
+						player[i].odds.oddsCall();
 					}
 				}
 
@@ -189,6 +195,8 @@ void Game::commCardDebug()
 					if(player[i].isActive())
 					{
 						player[i].fullHand.addCard(commCard[3]);
+						player[i].odds.addCard(commCard[3]);
+						player[i].odds.oddsCall();
 					
 					}
 				}
@@ -684,6 +692,8 @@ void Game::start()
 					{
 						player[i].fullHand.addCard(player[i].hand[0]);
 						player[i].fullHand.addCard(player[i].hand[1]);
+						player[i].odds.addCard(player[i].hand[0]);
+						player[i].odds.addCard(player[i].hand[1]);
 					}
 				}
 			}
@@ -1019,6 +1029,12 @@ void Game::start()
 							player[i].fullHand.addCard(commCard[0]);
 							player[i].fullHand.addCard(commCard[1]);
 							player[i].fullHand.addCard(commCard[2]);
+							player[i].odds.addCard(commCard[0]);
+							player[i].odds.addCard(commCard[1]);
+							player[i].odds.addCard(commCard[2]);
+							cout << "Odds::callOdds() Start\n";
+							player[i].odds.oddsCall();
+							cout << "Odds::callOdds() End\n";
 						}
 					}
 
@@ -1042,7 +1058,8 @@ void Game::start()
 						if(player[i].isActive())
 						{
 							player[i].fullHand.addCard(commCard[3]);
-					
+							player[i].odds.addCard(commCard[3]);
+							player[i].odds.oddsCall();
 						}
 					}
 
@@ -1066,7 +1083,7 @@ void Game::start()
 						if(player[i].isActive())
 						{
 							player[i].fullHand.addCard(commCard[4]);
-					
+							player[i].odds.addCard(commCard[4]);
 						}
 					}
 
