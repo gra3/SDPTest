@@ -82,6 +82,7 @@
     <ClCompile Include="CardDetect.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Odds.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PokerHand.cpp" />
     <ClCompile Include="Pot.cpp" />
@@ -92,6 +93,7 @@
     <ClInclude Include="CardDetect.h" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Odds.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PokerHand.h" />
     <ClInclude Include="Pot.h" />
