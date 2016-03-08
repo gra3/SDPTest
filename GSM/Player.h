@@ -2,7 +2,6 @@
 #include "Card.h"
 #include "CardDetect.h"
 #include "PokerHand.h"
-#include "Odds.h"
 
 class Player
 {
@@ -25,7 +24,6 @@ public:
 	bool buyInNextRound;
 	PokerHand fullHand;
 	double totalWon;
-	Odds odds;
 
 	Player* nextPlayer;
 
