@@ -435,7 +435,12 @@ bool PokerHand::compareTwoPair(vector<Card> &handIn)
 	else if(rankIn_HighPair==bestFive_HighPair)
 	{
 		if(rankIn_LowPair>bestFive_LowPair) return true;
-		else if(rankIn_HighCard>bestFive_HighCard) return true;
+		else if(rankIn_LowPair==bestFive_LowPair)
+		{
+			if(rankIn_HighCard>bestFive_HighCard) return true;
+			else if(rankIn_HighCard==bestFive_HighCard) return false;
+			else return false;
+		}
 		else return false;
 	}
 	else return false;
@@ -482,8 +487,17 @@ bool PokerHand::comparePair(vector<Card> &handIn)
 	else if(rankIn_Pair==bestFive_Pair)
 	{
 		if(rankIn_HighCard>bestFive_HighCard) return true;
-		else if(rankIn_Kicker>bestFive_Kicker) return true;
-		else if(rankIn_KickerTwo>bestFive_KickerTwo) return true;
+		else if(rankIn_HighCard==bestFive_HighCard)
+		{
+			if(rankIn_Kicker>bestFive_Kicker) return true;
+			else if(rankIn_Kicker==bestFive_Kicker)
+			{
+				if(rankIn_KickerTwo>bestFive_KickerTwo) return true;
+				else if(rankIn_KickerTwo==bestFive_KickerTwo) return false;
+				else return false;
+			}
+			else return false;
+		}
 		else return false;
 	}
 	else return false;

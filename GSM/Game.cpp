@@ -31,7 +31,7 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 
 
 	//Debug
-	debug = false;
+	debug = true;
 
 
 	for(int i=0;i<numPlayers;i++) player.push_back(Player());
@@ -157,6 +157,23 @@ void Game::dealingDebug()
 			player[i].fullHand.addCard(player[i].hand[1]);
 		}
 	}
+
+	//This part is replaced with the above to explicitly set cards for debugging
+	//player[0].hand[0].set(10,2);
+	//player[0].hand[1].set(10,3);
+	//player[0].fullHand.addCard(player[0].hand[0]);
+	//player[0].fullHand.addCard(player[0].hand[1]);
+
+	//player[1].hand[0].set(10,0);
+	//player[1].hand[1].set(10,3);
+	//player[1].fullHand.addCard(player[1].hand[0]);
+	//player[1].fullHand.addCard(player[1].hand[1]);
+
+	//player[2].hand[0].set(10,1);
+	//player[2].hand[1].set(7,0);
+	//player[2].fullHand.addCard(player[2].hand[0]);
+	//player[2].fullHand.addCard(player[2].hand[1]);
+	
 }
 
 void Game::commCardDebug()
@@ -1149,6 +1166,7 @@ void Game::start()
 				resetNewHand();
 				state=BLINDS;
 			}
+			
 
 			SDL_Delay(50);
 		}
