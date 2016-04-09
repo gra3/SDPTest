@@ -338,8 +338,22 @@ void Game::updatePlayer(int playerNum)
 	buildMsg += to_string(player[playerNum].isActive()) + " ";
 
 	//Player Winnings
-	buildMsg += to_string(player[playerNum].getWinnings()) + " \n";
+	buildMsg += to_string(player[playerNum].getWinnings()) + " ";
 
+	//Handheld
+	buildMsg += to_string(player[playerNum].odds.oddsOut.handHeld) + " ";
+
+	//Next best rank
+	buildMsg += to_string(player[playerNum].odds.oddsOut.nextHandRank) + " ";
+
+	//Next best odds
+	buildMsg += to_string(player[playerNum].odds.oddsOut.nextHandOdds) + " ";
+
+	//Best rank
+	buildMsg += to_string(player[playerNum].odds.oddsOut.bestHandRank) + " ";
+
+	//Best odds
+	buildMsg += to_string(player[playerNum].odds.oddsOut.bestHandOdds) + " \n";
 	
 	char* outMsg = &buildMsg[0u];
 	//cout << outMsg << endl;

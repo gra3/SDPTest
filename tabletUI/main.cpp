@@ -32,6 +32,9 @@ Button buyInButton;
 Button startButton;
 Button foldButton;
 Button betButton;
+Button oddsButton;
+
+bool dispOdds;
 
 Card handCard[2];
 Card commCard[5];
@@ -54,6 +57,17 @@ double minToRaise;
 string minToRaiseString;
 double totalWon;
 string totalWonString;
+
+int handRank;
+string handRankString;
+int nextHandRank;
+string nextHandRankString;
+int bestHandRank;
+string bestHandRankString;
+double nextOdds;
+string nextOddsString;
+double bestOdds;
+string bestOddsString;
 
 bool waitingForNextRound;
 bool isActive;
@@ -192,7 +206,7 @@ void proccessIncData(string strIn)
 	}
 	
 
-	if(data.size()==26)
+	if(data.size()==31)
 	{
 		handCard[0].set(data[1],data[0]);
 		handCard[1].set(data[3],data[2]);
@@ -251,6 +265,36 @@ void proccessIncData(string strIn)
 		stream.str(string());
 		stream << fixed << setprecision(2) << data[25];
 		totalWonString = stream.str();
+
+		//Handrank
+		handRank = data[26];
+		stream.str(string());
+		stream << fixed << setprecision(2) << data[26];
+		handRankString = stream.str();
+
+		//Next Handrank
+		nextHandRank = data[27];
+		stream.str(string());
+		stream << fixed << setprecision(2) << data[27];
+		nextHandRankString = stream.str();
+
+		//Next Odds
+		nextOdds = data[28];
+		stream.str(string());
+		stream << fixed << setprecision(2) << data[28];
+		nextOddsString = stream.str();
+
+		//Best Rank
+		bestHandRank = data[29];
+		stream.str(string());
+		stream << fixed << setprecision(2) << data[29];
+		bestHandRankString = stream.str();
+
+		//Best Odds
+		bestOdds = data[30];
+		stream.str(string());
+		stream << fixed << setprecision(2) << data[30];
+		bestOddsString = stream.str();
 	}
 	else
 	{
@@ -285,10 +329,57 @@ static int TcpThread(void *ptr)
 	return 0;
 }
 
+string handIntToStr(int handIn)
+{
+	switch(handIn){
+		case 0:
+			return "No Hand";
+			break;
+		case 1:
+			return "High Card";
+			break;
+		case 2:
+			return "Pair";
+			break;
+		case 3:
+			return "Two Pair";
+			break;
+		case 4:
+			return "Three of a Kind";
+		case 5:
+			return "Straight";
+			break;
+		case 6:
+			return "Flush";
+			break;
+		case 7:
+			return "Full House";
+			break;
+		case 8:
+			return "Four of a Kind";
+			break;
+		case 9:
+			return "Straight Flush";
+			break;
+		default:
+			return "Invalid Hand";
+			break;
+	}
+}
+
+void displayOdds()
+{
+	drawText(10,300, "Current Hand : " + handIntToStr(handRank));
+	drawText(10,350, "Next Best Hand : " + handIntToStr(nextHandRank));
+	drawText(10,400, "Odds of " + handIntToStr(nextHandRank) + " : " + nextOddsString + "%");
+	drawText(10,450, "Best Hand Possible : " + handIntToStr(bestHandRank));
+	drawText(10,500, "Odds of " + handIntToStr(bestHandRank) + " : " + bestOddsString + "%");
+}
+
 int main(int argc, char* args[])
 {
-	screenWidth = 700;
-	screenHeight = 400;
+	screenWidth = 1280; //700 orig
+	screenHeight = 800; //400 orig
 	initSDL();
 	TTF_Init();
 	//playerNum = playerNumber[0]-48;
@@ -296,25 +387,27 @@ int main(int argc, char* args[])
 	state = 0;
 	createWindow(screenWidth,screenHeight);
 	loadImages();
+	dispOdds = false;
 
-	font = TTF_OpenFont("Resources/Instruction.ttf",24);
+	font = TTF_OpenFont("Resources/Instruction.ttf",36);
 	if(font==NULL) cout << TTF_GetError() << endl;
 	setColor(0,0,0,255);
 
-	connectButton = Button((screenWidth/2)-65,(screenHeight/2)-25,130,50, gRenderer, "Resources/connect.png");
+	connectButton = Button((screenWidth/2)-130,(screenHeight/2)-50,260,100, gRenderer, "Resources/connect.png");
 	connectButton.enable();
-	buyInButton = Button((screenWidth/2)-65,(screenHeight/2)-25,130,50, gRenderer, "Resources/buyIn.png");
-	startButton = Button((screenWidth/2)-65,(screenHeight/2)-25,130,50, gRenderer, "Resources/start.png");
-	foldButton = Button(screenWidth-280,screenHeight-60,130,50,gRenderer, "Resources/fold.png");
-	betButton = Button(screenWidth- 140,screenHeight-60,130,50,gRenderer, "Resources/bet.png");
+	buyInButton = Button((screenWidth/2)-130,(screenHeight/2)-50,260,100, gRenderer, "Resources/buyIn.png");
+	startButton = Button((screenWidth/2)-130,(screenHeight/2)-50,260,100, gRenderer, "Resources/start.png");
+	foldButton = Button(screenWidth-560,screenHeight-120,260,100,gRenderer, "Resources/fold.png");
+	betButton = Button(screenWidth- 280,screenHeight-120,260,100,gRenderer, "Resources/bet.png");
+	oddsButton = Button(10,190,260,100,gRenderer, "Resources/bet.png");
 	
-	handCard[0] = Card(0,0,50,300,71,96,gRenderer);
-	handCard[1] = Card(0,0,125,300,71,96,gRenderer);
-	commCard[0] = Card(0,0,300,25,71,96,gRenderer);
-	commCard[1] = Card(0,0,375,25,71,96,gRenderer);
-	commCard[2] = Card(0,0,450,25,71,96,gRenderer);
-	commCard[3] = Card(0,0,525,25,71,96,gRenderer);
-	commCard[4] = Card(0,0,600,25,71,96,gRenderer);
+	handCard[0] = Card(0,0,91,600,142,182,gRenderer);
+	handCard[1] = Card(0,0,227,600,142,182,gRenderer);
+	commCard[0] = Card(0,0,546,50,142,182,gRenderer);
+	commCard[1] = Card(0,0,682,50,142,182,gRenderer);
+	commCard[2] = Card(0,0,818,50,142,182,gRenderer);
+	commCard[3] = Card(0,0,955,50,142,182,gRenderer);
+	commCard[4] = Card(0,0,1092,50,142,182,gRenderer);
 
 	waitingForNextRound = false;
 	state = 0;
@@ -334,6 +427,10 @@ int main(int argc, char* args[])
 			disableAllCards();
 			buyInButton.enable();
 		}
+
+		if(handRank!=0) oddsButton.enable();
+		else oddsButton.disable();
+
 		while( SDL_PollEvent( &e ) != 0 )
 			{
 
@@ -377,7 +474,15 @@ int main(int argc, char* args[])
 				{
 					sendServer("bet");
 				}
-
+				//Odds Button
+				if(oddsButton.isEnabled()&&oddsButton.handleEvent(&e)&&e.type == SDL_MOUSEBUTTONDOWN)
+				{
+					dispOdds = true;
+				}
+				if(oddsButton.isEnabled()&&oddsButton.handleEvent(&e)&&e.type == SDL_MOUSEBUTTONUP)
+				{
+					dispOdds = false;
+				}
 			}
 
 		string data;
@@ -400,17 +505,17 @@ int main(int argc, char* args[])
 			drawText(10,0,"Player " + to_string(playerNum));
 
 			//Draw Pot Total
-			if(state>0&&isActive) drawText(425,235,"Pot Total: $" + potTotalString);
+			if(state>0&&isActive) drawText(770,470,"Pot Total: $" + potTotalString);
 
 			//Draw Player Total
-			if(state>0&&isActive) drawText(425,270,"Chip Total: $:" + playerTotalString);
+			if(state>0&&isActive) drawText(770,540,"Chip Total: $:" + playerTotalString);
 
 			//Draw minToCall and currentBet
 			if(state==3&&isBetting) 
 			{
-				drawText(425,130, "Current Bet: $" + currentBetString);
-				drawText(425,165,"Min to Call: $" + minToCallString);
-				drawText(425,200,"Min to Raise: $" + minToRaiseString);
+				drawText(770,260, "Current Bet: $" + currentBetString);
+				drawText(770,330,"Min to Call: $" + minToCallString);
+				drawText(770,400,"Min to Raise: $" + minToRaiseString);
 			}
 
 			//Draw Winnings
@@ -420,6 +525,7 @@ int main(int argc, char* args[])
 			connectButton.draw();
 			buyInButton.draw();
 			startButton.draw();
+			oddsButton.draw();
 
 			foldButton.draw();
 			betButton.draw();
@@ -427,12 +533,15 @@ int main(int argc, char* args[])
 			//Draw Cards
 			drawAllCards();
 
+			//Display Odds
+			if(dispOdds) displayOdds();
+
 			//Draw Dealer Chip
-			setDest(225,300,75,75);
+			setDest(550,600,150,150);
 			if(isDealer&&isActive) SDL_RenderCopy(gRenderer,dealerImage,NULL,&dest);
 
 			//Draw Big/Small Blind chip
-			setDest(325,300,75,75);
+			setDest(385,600,150,150);
 			if(isBigBlind&&isActive) SDL_RenderCopy(gRenderer,bigBlindImage,NULL,&dest);
 			else if(isSmallBlind&&isActive) SDL_RenderCopy(gRenderer,smallBlindImage,NULL,&dest);
 

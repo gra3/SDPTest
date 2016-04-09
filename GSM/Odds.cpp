@@ -16,23 +16,30 @@
 
 Odds::Odds()
 {
-	hand.resize(6);
-	//hand[0].set(12,1);
-	//hand[1].set(13,1);
-	
-	//hand[0].set(8,3);
-	//hand[1].set(8,0);
-	
-	//hand[0].set(14,1);
-	//hand[1].set(6,1);
-	
-	hand[0].set(7,1);
-	hand[1].set(5,1);
-	
-	hand[2].set(14,0);
-	hand[3].set(8,1);
-	hand[4].set(6,1);
-	hand[5].set(4,1);
+	oddsOut.handHeld = 0;
+	oddsOut.nextHandRank = 0;
+	oddsOut.bestHandRank = 0;
+	oddsOut.thirdHandRank = 0;
+	oddsOut.nextHandOdds = 0;
+	oddsOut.bestHandOdds = 0;
+	oddsOut.thirdHandOdds = 0;
+	//hand.resize(6);
+	////hand[0].set(12,1);
+	////hand[1].set(13,1);
+	//
+	////hand[0].set(8,3);
+	////hand[1].set(8,0);
+	//
+	////hand[0].set(14,1);
+	////hand[1].set(6,1);
+	//
+	//hand[0].set(7,1);
+	//hand[1].set(5,1);
+	//
+	//hand[2].set(14,0);
+	//hand[3].set(8,1);
+	//hand[4].set(6,1);
+	//hand[5].set(4,1);
 
 }
 
@@ -1089,7 +1096,7 @@ double Odds::outsToOdds (double outs)
 	
 }
 
-void Odds::oddsClear()
+void Odds::clear()
 {
 	
 	hand.clear();
@@ -1304,4 +1311,4 @@ double Odds::oddsCall()
 	
 	//return(oddsReturn);
 	return(0);
-} 
+}

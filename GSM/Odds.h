@@ -50,7 +50,7 @@ public:
 	 int flushOdds();
 	 int straightOdds();
 	 int straightFlushOdds();
-	 void oddsClear();
+	 void clear();
 
 	 double oddsCall();
 	 double outsToOdds(double outs);
