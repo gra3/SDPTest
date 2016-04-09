@@ -16,13 +16,23 @@
 
 Odds::Odds()
 {
-	//hand.resize(6);
-	//hand[0].set(7,3);
-	//hand[1].set(6,0);
-	//hand[2].set(13,3);
-	//hand[3].set(6,2);
-	//hand[4].set(7,0);
-	//hand[5].set(14,2);
+	hand.resize(6);
+	//hand[0].set(12,1);
+	//hand[1].set(13,1);
+	
+	//hand[0].set(8,3);
+	//hand[1].set(8,0);
+	
+	//hand[0].set(14,1);
+	//hand[1].set(6,1);
+	
+	hand[0].set(7,1);
+	hand[1].set(5,1);
+	
+	hand[2].set(14,0);
+	hand[3].set(8,1);
+	hand[4].set(6,1);
+	hand[5].set(4,1);
 
 }
 
@@ -87,13 +97,13 @@ void Odds::calcSuits()
 		}
 
 	//debugging on screen output
-	//cout << endl << endl;
-	//for(int i=0;i<4;i++)
-	//	{
-	//		cout << "the number of suit";
-	//		cout << i;
-	//		cout << suitCount[i] << endl;
-	//	}
+	cout << endl << endl;
+	for(int i=0;i<4;i++)
+		{
+			cout << "the number of suit ";
+			cout << i;
+			cout << suitCount[i] << endl;
+		}
 	//end debugging
 
 }
@@ -163,6 +173,10 @@ int Odds::twoPairOdds ()
 	{
 		outs = (hand.size()-4)*3;
 	}
+	else if (hand.size() == 5 && outs == 0)
+	{
+		outs = 37;
+	}
 
 	/*/for debugging
 	cout << endl << "The number of outs for two pair:";
@@ -192,7 +206,10 @@ int Odds::threeofaKind ()
 	{
 		outs = numPair * 2;
 	}
-
+	else if (hand.size() == 5 && outs == 0)
+	{
+		outs = 38;
+	}
 	//for debugging
 	//cout << endl << "The number of outs for three of a kind:";
 	//cout << outs << endl;
@@ -223,6 +240,20 @@ int Odds::fourofaKind ()
 	if (numThree > 0)
 	{
 		outs = numThree;
+	}
+	else if (hand.size() == 5 && numPair > 0)
+	{
+		if (numPair == 1)
+		{
+			//outs = 0;
+			outs = 48;
+		}
+		if (numPair == 2)
+		{
+			//if we wish to display this small odds comment out outs = 0
+			//outs = 0; 
+			outs =49;
+		}
 	}
 
 	//for debugging
@@ -271,6 +302,10 @@ int Odds::fullHouseOdds()
 	{
 		outs = (hand.size()-4)*3;
 	}
+	else if (numPair == 1 && hand.size() == 5)
+	{
+		outs = 47;
+	}
 
 	//for debugging
 	//cout << endl << "The number of outs for a full house:";
@@ -283,7 +318,7 @@ int Odds::fullHouseOdds()
 int Odds::flushOdds ()
 {
 		int outs=0;
-	for (int i=0;i<3;i++)
+	for (int i=0;i<4;i++)
 	{
 		if (suitCount[i] > 4)
 		{
@@ -292,6 +327,10 @@ int Odds::flushOdds ()
 		else if (suitCount[i] == 4)
 		{
 			outs = 9;
+		}
+		else if (hand.size() == 5 && suitCount[i] == 3)
+		{
+			outs = 39;
 		}
 	}
 
@@ -462,6 +501,92 @@ int Odds::fourCardThree(int outs)
 	return (outs);
 }
 
+int Odds::runnerRunnerEdge(int outs)
+{
+	//this function checks if 3 of the 5 of the A-5 or 10-A straight are present
+	if (reducedHand[0] == 1)
+	{
+		for (int i = 1; i < 5; i++)
+		{
+			int j = 1;
+			int k = 0; //k makes sure the distance between the high and low is 2 units, the 3 cards are in a row
+			j = reducedHand[i-1]+reducedHand[i]+reducedHand[i+1];
+			k = reducedHand[i+1] - reducedHand[i-1];
+			if (reducedHand[i] != 0 && j % reducedHand[i] == 0 && k == 2)
+			{
+				outs = 32;
+			}
+		}
+	}
+	
+	return(outs);
+}
+
+int Odds::runnerRunnerThreeRow(int outs)
+{
+	//This Function will check to see if there are 3 cards in a row in a group of 5 cards starting at 2
+	if (reducedHand[0] != 1)
+	{
+		for (int i = 1; i < 5; i++)
+		{
+			int j = 1;
+			int k = 0; //k makes sure the distance between the high and low is 2 units, the 3 cards are in a row
+			j = reducedHand[i-1]+reducedHand[i]+reducedHand[i+1];
+			k = reducedHand[i+1] - reducedHand[i-1];
+			if (reducedHand[i] != 0 && j % reducedHand[i] == 0 && k == 2)
+			{
+				outs = 36;
+			}
+		}
+	}
+	return(outs);
+}
+
+int Odds::runnerRunnerGapOne(int outs)
+{
+	//this function will check to see if in a sliding block of 4 cards if there are 3.
+	for (int i = 1; i < 5; i++)//is there a gap below reducedhand[i]
+		{
+			int j = 1;
+			int k = 0; //k makes sure the distance between the high and low is 3 units, the 3 cards have one gap
+			j = reducedHand[i-1]+reducedHand[i]+reducedHand[i+1]+1;
+			k = reducedHand[i+1] - reducedHand[i-1];
+			if (reducedHand[i] != 0 && j % reducedHand[i] == 0 && k == 3)
+			{
+				outs = 34;
+			}
+		}
+	for (int i = 1; i < 5; i++)//is there a gap above reducedhand[i]
+		{
+			int j = 1;
+			int k = 0; //k makes sure the distance between the high and low is 3 units, the 3 cards have one gap
+			j = reducedHand[i-1]+reducedHand[i]+reducedHand[i+1]-1;
+			k = reducedHand[i+1] - reducedHand[i-1];
+			if (reducedHand[i] != 0 && j % reducedHand[i] == 0 && k ==3)
+			{
+				outs = 34;
+			}
+		}
+	return (outs);
+}
+
+int Odds::runnerRunnerGapTwo(int outs)
+{
+	//this function will check to see if in a sliding block of 5 cards if there are 3.
+	for (int i = 1; i < 5; i++)
+		{
+			int j = 1;
+			int k = 0; //k makes sure the distance between the high and low is 4 units, the 3 cards have a gap between each
+			j = reducedHand[i-1]+reducedHand[i]+reducedHand[i+1];
+			k = reducedHand[i+1] - reducedHand[i-1];
+			if (reducedHand[i] != 0 && j % reducedHand[i] == 0 && k == 4)
+			{
+				outs = 34;
+			}
+		}
+	return (outs);
+}
+
 
 int Odds::straightOdds()
 {
@@ -536,13 +661,41 @@ int Odds::straightOdds()
 	}
 
 	//this else if block checks 4 in a row starting with the low card.
-	else 
+	else if (outs == 0 && hand.size() == 5)
+	{
+		
+		outs = runnerRunnerGapOne(outs);
+		outs = runnerRunnerGapTwo(outs);
+		outs = runnerRunnerThreeRow(outs);
+		outs = runnerRunnerEdge(outs);
+	}
+
+	if (outs <99)
 	{
 		outs = fourCardZero(outs);
 		outs = fourCardOne(outs);
 		outs = fourCardTwo(outs);
 		outs = fourCardThree(outs);
+		
 	}
+
+
+	//Runner runner for straight.
+	/*
+	if (outs == 0 && hand.size == 5)
+	{
+	//run straight from A to 5 missing 2 and from 10 to A missing 2 
+	}
+	if (outs == 0 && hand.size == 5)
+	{
+	// Odds in the 2 to 
+	}
+	if (outs == 0 && hand.size == 5)
+	{
+
+	}
+	*/
+
 
 	//this else if block checks 4 in a row starting with reducedhand[1] card.
 	/*This section is an attempt at optimization that is not working correct
@@ -565,8 +718,8 @@ int Odds::straightOdds()
 	*/
 
 	//for debugging
-	//cout << endl << "The number of outs for a straight:";
-	//cout << outs << endl;
+	cout << endl << "The number of outs for a straight:";
+	cout << outs << endl;
 	//end debugging
 
 	return outs;
@@ -649,12 +802,30 @@ int Odds::straightFlushOdds()
 				outs = 99;
 			}
 
-			else 
+			else if (outs == 0 && hand.size() == 5)
+			{
+				
+				outs = runnerRunnerGapOne(outs);
+				outs = runnerRunnerGapTwo(outs);
+				outs = runnerRunnerThreeRow(outs);
+				outs = runnerRunnerEdge(outs);
+				if (outs != 0)
+				{
+					outs = outs + 10; //this will move so that the odds are 1/4 the straight odds
+				}
+			}
+
+			if (outs < 99)
 			{
 				outs = fourCardZero(outs);
 				outs = fourCardOne(outs);
 				outs = fourCardTwo(outs);
 				outs = fourCardThree(outs);
+			}
+
+			if (outs > 0 && outs < 30)
+			{
+				outs = outs/4;
 			}
 	
 			/*This section is an attempt at optimization that is not working correct.
@@ -686,8 +857,8 @@ int Odds::straightFlushOdds()
 	}
 
 	//for debugging
-	//cout << endl << "The number of outs for a straight flush:";
-	//cout << outs << endl;
+	cout << endl << "The number of outs for a straight flush:";
+	cout << outs << endl;
 	//end debugging
 	return outs;
 }
@@ -773,6 +944,54 @@ double Odds::outsToOdds (double outs)
 		else if (outs == 18)
 		{
 			odds = 62.44;
+		}
+		else if (outs == 32 )
+		{
+			odds = 1.48;
+		}
+		else if (outs == 34 )
+		{
+			odds = 2.96;
+		}
+		else if (outs == 36 )
+		{
+			odds = 4.44;
+		}
+		else if (outs == 37 )
+		{
+			odds = 8.33;
+		}
+		else if (outs == 38 )
+		{
+			odds = 1.39;
+		}
+		else if (outs == 39 )
+		{
+			odds = 4.16;
+		}
+		else if (outs == 42 )
+		{
+			odds = .37;
+		}
+		else if (outs == 44 )
+		{
+			odds = .74;
+		}
+		else if (outs == 46 )
+		{
+			odds = 1.11;
+		}
+		else if (outs == 47 )
+		{
+			odds = 1.67;
+		}
+		else if (outs == 48 )
+		{
+			odds = 0.01;
+		}
+		else if (outs == 49 )
+		{
+			odds = 0.02;
 		}
 		else if (outs == 99)
 		{
@@ -870,12 +1089,52 @@ double Odds::outsToOdds (double outs)
 	
 }
 
+void Odds::oddsClear()
+{
+	
+	hand.clear();
+	for (int i = 0; i < 9; i++)
+	{
+		reducedHand[i] = 0;
+	}
+	for(int i=0;i<15;i++)
+	{
+		rankCount[i] = 0;
+	}
+	for(int i=0;i<4;i++)
+	{
+		suitCount[i] = 0;
+	}
+	for(int i=0;i<15;i++)
+	{
+		rankXtra[i] = 0;
+	}
+	for (int i = 0; i < 9; i++)
+	{
+		reducedHand[i] = 0;
+	}
+	/*
+	hand.push_back (newCard);
+
+	for (unsigned int i = 0 ; i < hand.size(); i++)
+	{
+		hand[i].printCard();
+	}
+	*/
+}
+
+void Odds::addCard(Card cardIn)
+{
+	hand.push_back(cardIn);
+
+}
+
 double Odds::oddsCall()
 {
-	double odds[9];
-	int outs[9];
+	double odds[10];
+	int outs[10];
 	//double oddsReturn[3][3];  //the first part is the odds the second is the hand.
-	for (int i =0; i < 9; i++)
+	for (int i =0; i < 10; i++)
 	{
 		outs[i] = 0;
 		odds[i] = 0;
@@ -895,16 +1154,16 @@ double Odds::oddsCall()
 	HandSort();		//sort the hand
 	calcRanks();	//how many of each rank card are there
 	calcSuits();	//how many of each suit are there
-	outs[1] = onePairOdds();
-	outs[2] = twoPairOdds();
-	outs[3] = threeofaKind();
-	outs[4] = straightOdds();
-	outs[5] = flushOdds();
-	outs[6] = fullHouseOdds();
-	outs[7] = fourofaKind();
-	outs[8] = straightFlushOdds();
+	outs[2] = onePairOdds();
+	outs[3] = twoPairOdds();
+	outs[4] = threeofaKind();
+	outs[5] = straightOdds();
+	outs[6] = flushOdds();
+	outs[7] = fullHouseOdds();
+	outs[8] = fourofaKind();
+	outs[9] = straightFlushOdds();
 
-	for (int i = 0; i<9; i++)
+	for (int i = 1; i<10; i++)
 	{
 		if (outs[i] != 0)
 		{
@@ -915,32 +1174,33 @@ double Odds::oddsCall()
 	//debugging
 
 	cout << endl << "The odds for a straight flush:";
-	cout << odds[8] << "%" << endl;
+	cout << odds[9] << "%" << endl;
 	cout << endl << "The odds for a four of a kind:";
-	cout << odds[7] << "%" << endl;
+	cout << odds[8] << "%" << endl;
 	cout << endl << "The odds for a full house:";
-	cout << odds[6] << "%" << endl;
+	cout << odds[7] << "%" << endl;
 	cout << endl << "The odds for a flush:";
-	cout << odds[5] << "%" << endl;
+	cout << odds[6] << "%" << endl;
 	cout << endl << "The odds for a straight:";
-	cout << odds[4] << "%" << endl;
+	cout << odds[5] << "%" << endl;
 	cout << endl << "The odds for a three of a kind:";
-	cout << odds[3] << "%" << endl;
+	cout << odds[4] << "%" << endl;
 	cout << endl << "The odds for two pair:";
-	cout << odds[2] << "%" << endl;
+	cout << odds[3] << "%" << endl;
 	cout << endl << "The odds for a pair:";
-	cout << odds[1] << "%" << endl;
+	cout << odds[2] << "%" << endl;
 	//end debugging  */
 
 
 	oddsOut.bestHandRank = 0;
 	oddsOut.nextHandRank = 0;
-	oddsOut.thirdHandRank =0;
+	oddsOut.thirdHandRank= 0;
 	oddsOut.bestHandOdds = 0;
 	oddsOut.nextHandOdds = 0;
-	oddsOut.thirdHandOdds =0;
-	oddsOut.handHeld = 0;
-	for (int i = 8 ; i > 0; i--)
+	oddsOut.thirdHandOdds= 0;
+	oddsOut.handHeld = 1;
+	//
+	for (int i = 9 ; i > 1; i--)
 	{
 		if (odds[i] == 100)
 		{
@@ -949,19 +1209,38 @@ double Odds::oddsCall()
 		}
 	}
 
-	for (int i = oddsOut.handHeld ; i < 8; i++) //starting at the next best hand 
+	for (int i = oddsOut.handHeld ; i < 10; i++) //starting at the next best hand 
 	{
 		if (odds[i] > 0 && odds[i] < 100)
 		{
 			oddsOut.nextHandRank = i;
 			oddsOut.nextHandOdds = odds[i];
+			if (i == 4 && odds[4] == odds[7]) //if the player holds 2 pair this statment runs
+			{
+				if (odds[5] > odds[7])
+				{
+					oddsOut.nextHandRank = 5;
+					oddsOut.nextHandOdds = odds[5];
+				}
+				else if (odds[6] > odds[7])
+				{
+					oddsOut.nextHandRank = 6;
+					oddsOut.nextHandOdds = odds[6];
+				}
+				else
+				{
+				oddsOut.nextHandRank = 7;		//this statment will set the next hand odds to 
+				oddsOut.nextHandOdds = odds[7];	//full house odds as if a 3 of a kind is drawn 
+												//the player has a full house.
+				}
+			}
 			i = 10;
 		}
 	}
 
-	for (int i = 8 ; i > oddsOut.handHeld ; i--)
+	for (int i = 9 ; i > oddsOut.handHeld-1 ; i--)
 	{
-		if (odds[i] > 0 && odds[i] < 100)
+		if (odds[i] > 1 && odds[i] < 100) //odds here is the threshold of %chance to draw shown
 		{
 			oddsOut.bestHandRank = i;
 			oddsOut.bestHandOdds = odds[i];
@@ -969,10 +1248,17 @@ double Odds::oddsCall()
 		}
 	}
 
-	if (odds[0] > 0 && odds[0] < 101)
+	for (int i = 9 ; i > oddsOut.handHeld-1 ; i--)
 	{
-		//return one pair odds
+		if (odds[i] > 8 && odds[i] < 100) //odds here is the threshold of %chance to draw shown
+		{
+			oddsOut.thirdHandRank = i;
+			oddsOut.thirdHandOdds = odds[i];
+			i = 0;
+		}
 	}
+
+	/*
 	if (odds[1] > 0 && odds[1] < 101)
 	{
 		//return two pair odds
@@ -1001,24 +1287,21 @@ double Odds::oddsCall()
 	{
 		//return straight flush odds
 	}
-
-
+	if (odds[0] > 0 && odds[0] < 101)
+	{
+		//return one pair odds
+	}
+	*/
 	
 	cout << endl << "The rank of the hand held is: " << oddsOut.handHeld << endl;
 	cout << "The next best hands rank is: " << oddsOut.nextHandRank << endl;
 	cout << "The next best hands odds are: " << oddsOut.nextHandOdds << "%" << endl;
+	cout << "A middle hands rank is: " << oddsOut.thirdHandRank << endl;
+	cout << "A middle hands odds are: " << oddsOut.thirdHandOdds << "%" << endl;
 	cout << "The best hands rank is: " << oddsOut.bestHandRank << endl;
 	cout << "The best hands odds are: " << oddsOut.bestHandOdds << "%" << endl;
+	
+	
 	//return(oddsReturn);
 	return(0);
-}
-
-void Odds::addCard(Card CardIn)
-{
-	hand.push_back(CardIn);
-}
-
-void Odds::clear()
-{
-	hand.clear();
-}
+} 
