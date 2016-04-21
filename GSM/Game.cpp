@@ -31,7 +31,7 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 
 
 	//Debug
-	debug = true;
+	debug = false;
 
 
 	for(int i=0;i<numPlayers;i++) player.push_back(Player());
@@ -61,8 +61,8 @@ Game::Game(int numPlayers,double sB, double bB, double buy)
 	commCard[4] = Card(0,0);
 
 	//Initialize Cameras
-	//initializeCameras();
-	initializeCamerasToZero();
+	initializeCameras();
+	//initializeCamerasToZero();
 
 
 

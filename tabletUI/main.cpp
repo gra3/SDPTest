@@ -33,6 +33,7 @@ Button startButton;
 Button foldButton;
 Button betButton;
 Button oddsButton;
+Button exitButton;
 
 bool dispOdds;
 
@@ -399,7 +400,10 @@ int main(int argc, char* args[])
 	startButton = Button((screenWidth/2)-130,(screenHeight/2)-50,260,100, gRenderer, "Resources/start.png");
 	foldButton = Button(screenWidth-560,screenHeight-120,260,100,gRenderer, "Resources/fold.png");
 	betButton = Button(screenWidth- 280,screenHeight-120,260,100,gRenderer, "Resources/bet.png");
-	oddsButton = Button(10,190,260,100,gRenderer, "Resources/bet.png");
+	oddsButton = Button(10,190,260,100,gRenderer, "Resources/odds.png");
+	exitButton = Button(0,0,260,100,gRenderer, "Resources/exit.png");
+	exitButton.enable();
+
 	
 	handCard[0] = Card(0,0,91,600,142,182,gRenderer);
 	handCard[1] = Card(0,0,227,600,142,182,gRenderer);
@@ -477,11 +481,14 @@ int main(int argc, char* args[])
 				//Odds Button
 				if(oddsButton.isEnabled()&&oddsButton.handleEvent(&e)&&e.type == SDL_MOUSEBUTTONDOWN)
 				{
-					dispOdds = true;
+					if(dispOdds == false) dispOdds = true;
+					else if(dispOdds == true) dispOdds = false;
 				}
-				if(oddsButton.isEnabled()&&oddsButton.handleEvent(&e)&&e.type == SDL_MOUSEBUTTONUP)
+				//Exit Button
+				if(exitButton.isEnabled()&&exitButton.handleEvent(&e)&&e.type == SDL_MOUSEBUTTONDOWN)
 				{
-					dispOdds = false;
+					quit = true;
+					exit(1);
 				}
 			}
 
@@ -526,6 +533,7 @@ int main(int argc, char* args[])
 			buyInButton.draw();
 			startButton.draw();
 			oddsButton.draw();
+			//exitButton.draw();
 
 			foldButton.draw();
 			betButton.draw();

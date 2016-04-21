@@ -11,7 +11,7 @@ using namespace std;
 
 int main(int argc, char* args[])
 {
-	Game game(3, 0.25, 0.5, 20.0);
+	Game game(2, 0.25, 0.5, 20.0);
 	game.start();
 
 	return 0;
